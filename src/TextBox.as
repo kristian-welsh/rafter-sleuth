@@ -1,35 +1,35 @@
 package  {
 	import flash.display.MovieClip;
 
-	public class TextBoxManager {
-		private var textBox:MovieClip;
+	public class TextBox {
+		private var view:MovieClip;
 		
-		public function TextBoxManager(textBox:MovieClip) {
-			this.textBox = textBox;
+		public function TextBox(view:MovieClip) {
+			this.view = view;
 		}
 		
 		public function displayTextPane(textPaneNumber:uint):void {
-			textBox.gotoAndStop(textPaneNumber);
+			view.gotoAndStop(textPaneNumber);
 		}
 		
 		public function get visible():Boolean {
-			return textBox.visible;
+			return view.visible;
 		}
 		
 		public function show():void {
-			textBox.visible = true;
+			view.visible = true;
 		}
 		
 		public function hide():void {
-			textBox.visible = false;
+			view.visible = false;
 		}
 		
 		public function get currentTextPane():int {
-			return textBox.currentFrame;
+			return view.currentFrame;
 		}
 		
 		public function get box():MovieClip {
-			return textBox.box;
+			return view.box;
 		}
 	}
 }

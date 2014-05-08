@@ -21,15 +21,12 @@ package {
 		private var level:MovieClip;
 		private var restartGameFunction:Function;
 		// cannot use stage.gotoAndPlay(1) for some reason, so pass in a function from the timeline that does that
-		private var textBox:TextBoxManager;
+		private var textBox:TextBox;
+		private var keyboard:KeyboardControls;
 		
 		private var lastDir:String = "right";
 		private var savedX:Number;
 		private var savedY:Number;
-		private var leftKeyDown:Boolean = false;
-		private var rightKeyDown:Boolean = false;
-		private var spaceKeyDown:Boolean = false;
-		private var shiftKeyDown:Boolean = false;
 		private var grounded:Boolean = false;
 		private var invincible:Boolean = false;
 		private var attacking:Boolean = false;
@@ -58,7 +55,8 @@ package {
 			this.userInterface = ui;
 			this.level = level;
 			this.restartGameFunction = restartGameFunction;
-			textBox = new TextBoxManager(textDisplay);
+			textBox = new TextBox(textDisplay);
+			keyboard = new KeyboardControls(this);
 			super();
 		}
 		
@@ -79,57 +77,23 @@ package {
 		}
 		
 		private function addlisteners():void {
-			stage.addEventListener(KeyboardEvent.KEY_DOWN, checkKeyDown);
-			stage.addEventListener(KeyboardEvent.KEY_UP, checkKeyUp);
+			keyboard.startListening(stage);
 			player.addEventListener(Event.ENTER_FRAME, playerMove);
 			tocker.addEventListener(TimerEvent.TIMER, clock);
-		}
-		
-		private function checkKeyDown(event:KeyboardEvent):void {
-			if (event.keyCode == Keycode.LEFT_ARROW) {
-				leftKeyDown = true;
-			}
-			if (event.keyCode == Keycode.RIGHT_ARROW) {
-				rightKeyDown = true;
-			}
-			if (event.keyCode == Keycode.SHIFT) {
-				attack();
-				shiftKeyDown = true;
-			}
-		}
-		
-		private function checkKeyUp(event:KeyboardEvent):void {
-			if (event.keyCode == Keycode.LEFT_ARROW) {
-				leftKeyDown = false;
-			}
-			if (event.keyCode == Keycode.RIGHT_ARROW) {
-				rightKeyDown = false;
-			}
-			if (event.keyCode == Keycode.SPACEBAR && shouldJump()) {
-				jump();
-			}
-			if (event.keyCode == Keycode.ENTER) {
-				checkForText();
-			}
-			if (event.keyCode == Keycode.SHIFT) {
-				shiftKeyDown = false;
-				can_attack = true;
-			}
-			if (event.keyCode == Keycode.M) {
-				viewMap();
-			}
 		}
 		
 		private function shouldJump():Boolean {
 			return grounded && (!attacking) && canJump;
 		}
 		
-		private function jump():void {
-			grounded = false;
-			jumpSpeed = 35;
-			if (tutorial == 3) {
-				canAdvanceText = true;
-				checkForText();
+		public function jump():void {
+			if (shouldJump()) {
+				grounded = false;
+				jumpSpeed = 35;
+				if (tutorial == 3) {
+					canAdvanceText = true;
+					checkForText();
+				}
 			}
 		}
 		
@@ -196,7 +160,7 @@ package {
 			if (attacking)
 				return;
 			if (canMove) {
-				if (leftKeyDown && !rightKeyDown) {
+				if (keyboard.leftKeyDown && !keyboard.rightKeyDown) {
 					if (!collideH()) {
 						if (player.person.currentFrame != 4 && grounded) {
 							player.person.gotoAndStop("walkL");
@@ -205,7 +169,7 @@ package {
 					}
 					lastDir = "left";
 				}
-				if (rightKeyDown && !leftKeyDown) {
+				if (keyboard.rightKeyDown && !keyboard.leftKeyDown) {
 					if (!collideH()) {
 						if (player.person.currentFrame != 3 && grounded) {
 							player.person.gotoAndStop("walkR");
@@ -214,12 +178,12 @@ package {
 					}
 					lastDir = "right";
 				}
-				if ((leftKeyDown || rightKeyDown) && tutorial == 2) {
+				if ((keyboard.leftKeyDown || keyboard.rightKeyDown) && tutorial == 2) {
 					canAdvanceText = true;
 					checkForText();
 				}
 			}
-			if (((!leftKeyDown && !rightKeyDown) || (leftKeyDown && rightKeyDown)) && grounded) {
+			if (((!keyboard.leftKeyDown && !keyboard.rightKeyDown) || (keyboard.leftKeyDown && keyboard.rightKeyDown)) && grounded) {
 				if (playerIsFacing("right") && player.person.currentFrame != 1) {
 					player.person.gotoAndStop("idleR");
 				}
@@ -279,7 +243,7 @@ package {
 			for (var i:uint = 0; i < level.edge_plats.numChildren; i++) {
 				if (player.y > level.edge_plats.getChildAt(i).y + level.edge_plats.y + level.y) {
 					if (player.y - player.height < level.edge_plats.getChildAt(i).y + level.edge_plats.y + level.y + 100) {
-						if (leftKeyDown) {
+						if (keyboard.leftKeyDown) {
 							if (player.x - PLAYER_RADIUS > level.edge_plats.getChildAt(i).x + level.edge_plats.x + level.x + 100) {
 								if (player.x - PLAYER_RADIUS - mainSpeed < level.edge_plats.getChildAt(i).x + level.edge_plats.x + level.x + 100) {
 									player.x = level.edge_plats.getChildAt(i).x + level.edge_plats.x + level.x + 100 + PLAYER_RADIUS + 1;
@@ -291,7 +255,7 @@ package {
 								}
 							}
 						}
-						if (rightKeyDown) {
+						if (keyboard.rightKeyDown) {
 							if (player.x + PLAYER_RADIUS < level.edge_plats.getChildAt(i).x + level.edge_plats.x + level.x) {
 								if (player.x + PLAYER_RADIUS + mainSpeed > level.edge_plats.getChildAt(i).x + level.edge_plats.x + level.x) {
 									player.x = level.edge_plats.getChildAt(i).x + level.edge_plats.x + level.x - PLAYER_RADIUS - 1;
@@ -372,7 +336,7 @@ package {
 			canAttack = false;
 		}
 		
-		private function attack() {
+		public function attack() {
 			if (!attacking && grounded && can_attack && canAttack) {
 				can_attack = false;
 				attacking = true;
@@ -390,7 +354,7 @@ package {
 			}
 		}
 		
-		private function checkForText() {
+		public function checkForText():void {
 			if (!textBox.visible)
 				return;
 			switch (textBox.currentTextPane) {
@@ -508,8 +472,6 @@ package {
 		
 		private function gameWin(MouseEvent) {
 			resetGame();
-			stage.removeEventListener(KeyboardEvent.KEY_DOWN, checkKeyDown);
-			stage.removeEventListener(KeyboardEvent.KEY_UP, checkKeyUp);
 			player.removeEventListener(Event.ENTER_FRAME, playerMove);
 			tocker.removeEventListener(TimerEvent.TIMER, clock);
 			restartGameFunction();
@@ -619,7 +581,7 @@ package {
 			canAdvanceText = true;
 		}
 		
-		private function viewMap() {
+		public function viewMap() {
 			if (level.currentFrame < 17) {
 				player.removeEventListener(Event.ENTER_FRAME, playerMove);
 				level.gotoAndStop(18);
