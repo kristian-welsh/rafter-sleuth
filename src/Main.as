@@ -11,7 +11,7 @@ package {
 	// BUG: if you use the map before themission giver gets to the stand, the mission giver never shows up
 	// BUG: you need to click the screen again after using the map to be able to control your character again
 	// BUG: if you use the map in mid-air you fall out of the level
-	public class Main extends Sprite {
+	public class Main extends Sprite implements KeyboardResponder {
 		static private const IMPULSE_SIZE:Number = 20;
 		static private const PLAYER_RADIUS:int = 45;
 		static private const ATTACK_RADIUS:int = 175;
@@ -30,11 +30,13 @@ package {
 		private var grounded:Boolean = false;
 		private var invincible:Boolean = false;
 		private var attacking:Boolean = false;
+		
 		private var can_attack:Boolean = true;
+		private var canAttack:Boolean = false;
+		
 		private var canAdvanceText:Boolean = true;
 		private var canMove:Boolean = false;
 		private var canJump:Boolean = false;
-		private var canAttack:Boolean = false;
 		private var collectedItem:Boolean = false;
 		private var mainSpeed:Number = 15;
 		private var jumpSpeed:Number = 0;
@@ -183,7 +185,7 @@ package {
 					checkForText();
 				}
 			}
-			if (((!keyboard.leftKeyDown && !keyboard.rightKeyDown) || (keyboard.leftKeyDown && keyboard.rightKeyDown)) && grounded) {
+			if (playerShouldBeIdle()) {
 				if (playerIsFacing("right") && player.person.currentFrame != 1) {
 					player.person.gotoAndStop("idleR");
 				}
@@ -193,7 +195,11 @@ package {
 			}
 		}
 		
-		private function fall() {
+		private function playerShouldBeIdle():Boolean {
+			return ((!keyboard.leftKeyDown && !keyboard.rightKeyDown) || (keyboard.leftKeyDown && keyboard.rightKeyDown)) && grounded
+		}
+		
+		private function fall():void {
 			if (grounded)
 				return;
 			if (playerIsFacing("right") && player.person.currentFrame != 5) {
@@ -224,11 +230,11 @@ package {
 				}
 			}
 			if (i == level.h_plats.numChildren) {
-				collidesArchNemesis();
+				keepFalling();
 			}
 		}
 		
-		private function collidesArchNemesis() {
+		private function keepFalling() {
 			grounded = false;
 			if (playerIsFacing("right") && player.currentFrame != 5) {
 				player.person.gotoAndStop("jumpR");
@@ -336,9 +342,9 @@ package {
 			canAttack = false;
 		}
 		
-		public function attack() {
-			if (!attacking && grounded && can_attack && canAttack) {
-				can_attack = false;
+		public function attack():void {
+			if (!attacking && grounded && keyboard.can_attack && canAttack) {
+				keyboard.can_attack = false;
 				attacking = true;
 				var ghost:MovieClip;
 				for (var i:uint = 0; i < level.ghosts.numChildren; i++) {
@@ -581,7 +587,7 @@ package {
 			canAdvanceText = true;
 		}
 		
-		public function viewMap() {
+		public function viewMap():void {
 			if (level.currentFrame < 17) {
 				player.removeEventListener(Event.ENTER_FRAME, playerMove);
 				level.gotoAndStop(18);

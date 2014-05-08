@@ -3,14 +3,13 @@ package  {
 	import flash.events.*;
 	
 	public class KeyboardControls {
-		private var main:Main;
+		private var responder:KeyboardResponder;
 		private var _leftKeyDown:Boolean;
 		private var _rightKeyDown:Boolean;
-		private var _shiftKeyDown:Boolean;
 		private var _can_attack:Boolean;
 		
-		public function KeyboardControls(main:Main) {
-			this.main = main;
+		public function KeyboardControls(responder:KeyboardResponder) {
+			this.responder = responder;
 		}
 		
 		public function startListening(dispatcher:IEventDispatcher):void {
@@ -26,8 +25,7 @@ package  {
 				_rightKeyDown = true;
 			}
 			if (event.keyCode == Keycode.SHIFT) {
-				main.attack();
-				_shiftKeyDown = true;
+				responder.attack();
 			}
 		}
 		
@@ -39,17 +37,16 @@ package  {
 				_rightKeyDown = false;
 			}
 			if (event.keyCode == Keycode.SPACEBAR) {
-				main.jump();
+				responder.jump();
 			}
 			if (event.keyCode == Keycode.ENTER) {
-				main.checkForText();
+				responder.checkForText();
 			}
 			if (event.keyCode == Keycode.SHIFT) {
-				_shiftKeyDown = false;
 				_can_attack = true;
 			}
 			if (event.keyCode == Keycode.M) {
-				main.viewMap();
+				responder.viewMap();
 			}
 		}
 		
@@ -61,12 +58,12 @@ package  {
 			return _rightKeyDown;
 		}
 		
-		public function get shiftKeyDown():Boolean {
-			return _shiftKeyDown;
-		}
-		
 		public function get can_attack():Boolean {
 			return _can_attack;
+		}
+		
+		public function set can_attack(value:Boolean):void {
+			_can_attack = value;
 		}
 	}
 }
