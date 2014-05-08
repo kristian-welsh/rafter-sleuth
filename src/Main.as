@@ -1,12 +1,10 @@
 package {
-	import flash.display.DisplayObjectContainer;
-	import flash.display.Stage;
-	import flash.display.MovieClip;
+	import flash.display.*;
 	import flash.events.*;
-	import flash.media.SoundChannel;
+	import flash.media.*;
 	import flash.utils.Timer;
-	import flash.media.Sound;
 	import flash.display.Sprite;
+	import keyboard.*;
 	
 	// BUG: if you use the map before themission giver gets to the stand, the mission giver never shows up
 	// BUG: you need to click the screen again after using the map to be able to control your character again
@@ -22,7 +20,7 @@ package {
 		private var restartGameFunction:Function;
 		// cannot use stage.gotoAndPlay(1) for some reason, so pass in a function from the timeline that does that
 		private var textBox:TextBox;
-		private var keyboard:KeyboardControls;
+		private var keys:KeyboardControls;
 		
 		private var lastDir:String = "right";
 		private var savedX:Number;
@@ -31,7 +29,7 @@ package {
 		private var invincible:Boolean = false;
 		private var attacking:Boolean = false;
 		
-		private var can_attack:Boolean = true;
+		//???
 		private var canAttack:Boolean = false;
 		
 		private var canAdvanceText:Boolean = true;
@@ -44,21 +42,21 @@ package {
 		private var j:int;
 		private var score:int = 0;
 		private var life:int = 6;
-		private var mission:int = 0
-		private var tutorial:int = 1;
-		private var curLevel:int = 1;
+		private var currentMission:int = 0
+		private var tutorialProgress:int = 1;
+		private var currentLevel:int = 1;
 		private var missionSoundsChannel:SoundChannel = new SoundChannel();
 		private var questSound:Sound = new Bell_alert();
 		private var completeSound:Sound = new Mission_complete();
 		private var tocker:Timer = new Timer(1000);
 		
-		public function Main(ui:MovieClip, player:MovieClip, level:MovieClip, textDisplay:MovieClip, restartGameFunction:Function) {
+		public function Main(ui:MovieClip, player:MovieClip, level:MovieClip, textDisplay:MovieClip, restartGameFunction:Function):void {
 			this.player = player;
 			this.userInterface = ui;
 			this.level = level;
 			this.restartGameFunction = restartGameFunction;
 			textBox = new TextBox(textDisplay);
-			keyboard = new KeyboardControls(this);
+			keys = new KeyboardControls(this);
 			super();
 		}
 		
@@ -79,7 +77,7 @@ package {
 		}
 		
 		private function addlisteners():void {
-			keyboard.startListening(stage);
+			keys.startListening(stage);
 			player.addEventListener(Event.ENTER_FRAME, playerMove);
 			tocker.addEventListener(TimerEvent.TIMER, clock);
 		}
@@ -92,7 +90,7 @@ package {
 			if (shouldJump()) {
 				grounded = false;
 				jumpSpeed = 35;
-				if (tutorial == 3) {
+				if (tutorialProgress == 3) {
 					canAdvanceText = true;
 					checkForText();
 				}
@@ -103,13 +101,13 @@ package {
 			moveLeftAndRight();
 			fall();
 			collideV();
-			collectStamps();
-			collectTea();
+			collideStamps();
+			collideTea();
 			collideGhosts();
 			checkAttackStatus();
 			checkMissionDialougeCollision();
 			collideMissionObjects();
-			if (mission == 1) {
+			if (currentMission == 1) {
 				tocker.start();
 			}
 		/*
@@ -162,7 +160,7 @@ package {
 			if (attacking)
 				return;
 			if (canMove) {
-				if (keyboard.leftKeyDown && !keyboard.rightKeyDown) {
+				if (keys.leftKeyDown && !keys.rightKeyDown) {
 					if (!collideH()) {
 						if (player.person.currentFrame != 4 && grounded) {
 							player.person.gotoAndStop("walkL");
@@ -171,7 +169,7 @@ package {
 					}
 					lastDir = "left";
 				}
-				if (keyboard.rightKeyDown && !keyboard.leftKeyDown) {
+				if (keys.rightKeyDown && !keys.leftKeyDown) {
 					if (!collideH()) {
 						if (player.person.currentFrame != 3 && grounded) {
 							player.person.gotoAndStop("walkR");
@@ -180,7 +178,7 @@ package {
 					}
 					lastDir = "right";
 				}
-				if ((keyboard.leftKeyDown || keyboard.rightKeyDown) && tutorial == 2) {
+				if ((keys.leftKeyDown || keys.rightKeyDown) && tutorialProgress == 2) {
 					canAdvanceText = true;
 					checkForText();
 				}
@@ -196,7 +194,7 @@ package {
 		}
 		
 		private function playerShouldBeIdle():Boolean {
-			return ((!keyboard.leftKeyDown && !keyboard.rightKeyDown) || (keyboard.leftKeyDown && keyboard.rightKeyDown)) && grounded
+			return ((!keys.leftKeyDown && !keys.rightKeyDown) || (keys.leftKeyDown && keys.rightKeyDown)) && grounded
 		}
 		
 		private function fall():void {
@@ -215,7 +213,7 @@ package {
 			level.y += jumpSpeed;
 		}
 		
-		private function collideV() {
+		private function collideV():void {
 			for (var i:uint = 0; i < level.h_plats.numChildren; i++) {
 				if (player.x - PLAYER_RADIUS < level.h_plats.getChildAt(i).x + level.h_plats.x + level.x + 100) {
 					if (player.x + PLAYER_RADIUS > level.h_plats.getChildAt(i).x + level.h_plats.x + level.x) {
@@ -234,7 +232,7 @@ package {
 			}
 		}
 		
-		private function keepFalling() {
+		private function keepFalling():void {
 			grounded = false;
 			if (playerIsFacing("right") && player.currentFrame != 5) {
 				player.person.gotoAndStop("jumpR");
@@ -249,7 +247,7 @@ package {
 			for (var i:uint = 0; i < level.edge_plats.numChildren; i++) {
 				if (player.y > level.edge_plats.getChildAt(i).y + level.edge_plats.y + level.y) {
 					if (player.y - player.height < level.edge_plats.getChildAt(i).y + level.edge_plats.y + level.y + 100) {
-						if (keyboard.leftKeyDown) {
+						if (keys.leftKeyDown) {
 							if (player.x - PLAYER_RADIUS > level.edge_plats.getChildAt(i).x + level.edge_plats.x + level.x + 100) {
 								if (player.x - PLAYER_RADIUS - mainSpeed < level.edge_plats.getChildAt(i).x + level.edge_plats.x + level.x + 100) {
 									player.x = level.edge_plats.getChildAt(i).x + level.edge_plats.x + level.x + 100 + PLAYER_RADIUS + 1;
@@ -261,7 +259,7 @@ package {
 								}
 							}
 						}
-						if (keyboard.rightKeyDown) {
+						if (keys.rightKeyDown) {
 							if (player.x + PLAYER_RADIUS < level.edge_plats.getChildAt(i).x + level.edge_plats.x + level.x) {
 								if (player.x + PLAYER_RADIUS + mainSpeed > level.edge_plats.getChildAt(i).x + level.edge_plats.x + level.x) {
 									player.x = level.edge_plats.getChildAt(i).x + level.edge_plats.x + level.x - PLAYER_RADIUS - 1;
@@ -282,7 +280,7 @@ package {
 			return returnValue
 		}
 		
-		private function collectStamps() {
+		private function collideStamps():void {
 			var stamp:MovieClip;
 			for (var i:uint = 0; i < level.stamps.numChildren; i++) {
 				stamp = level.stamps.getChildAt(i) as MovieClip;
@@ -294,7 +292,7 @@ package {
 			}
 		}
 		
-		private function collectTea() {
+		private function collideTea():void {
 			if (player.hitBox.hitTestObject(level.teaCup)) {
 				level.removeChild(level.teaCup);
 				life++
@@ -302,7 +300,7 @@ package {
 			}
 		}
 		
-		private function collideGhosts() {
+		private function collideGhosts():void {
 			if (player.invincibility.currentFrame == 1) {
 				invincible = false;
 			}
@@ -343,8 +341,8 @@ package {
 		}
 		
 		public function attack():void {
-			if (!attacking && grounded && keyboard.can_attack && canAttack) {
-				keyboard.can_attack = false;
+			if (!attacking && grounded && keys.can_attack && canAttack) {
+				keys.can_attack = false;
 				attacking = true;
 				var ghost:MovieClip;
 				for (var i:uint = 0; i < level.ghosts.numChildren; i++) {
@@ -353,7 +351,7 @@ package {
 						level.ghosts.removeChild(ghost);
 					}
 				}
-				if (tutorial == 4) {
+				if (tutorialProgress == 4) {
 					canAdvanceText = true;
 					checkForText();
 				}
@@ -366,14 +364,14 @@ package {
 			switch (textBox.currentTextPane) {
 				case 1:
 					textBox.displayTextPane(2);
-					tutorial = 2;
+					tutorialProgress = 2;
 					canMove = true;
 					canAdvanceText = false;
 					break;
 				case 2:
 					if (canAdvanceText) {
 						textBox.displayTextPane(3);
-						tutorial = 3;
+						tutorialProgress = 3;
 						canAdvanceText = false;
 						canJump = true;
 						canMove = false;
@@ -382,7 +380,7 @@ package {
 				case 3:
 					if (canAdvanceText) {
 						textBox.displayTextPane(4);
-						tutorial = 4;
+						tutorialProgress = 4;
 						canAdvanceText = false;
 						canJump = false;
 						canAttack = true;
@@ -391,33 +389,33 @@ package {
 				case 4:
 					if (canAdvanceText) {
 						textBox.displayTextPane(5);
-						tutorial = 5;
+						tutorialProgress = 5;
 						canAttack = false;
 					}
 					break;
 				case 5:
 					textBox.displayTextPane(6);
-					tutorial = 6;
+					tutorialProgress = 6;
 					break;
 				case 6:
 					textBox.displayTextPane(7);
-					tutorial = 7;
+					tutorialProgress = 7;
 					break;
 				case 7:
 					textBox.displayTextPane(8);
-					tutorial = 8;
+					tutorialProgress = 8;
 					break;
 				case 8:
 					textBox.displayTextPane(9);
-					tutorial = 9;
+					tutorialProgress = 9;
 					break;
 				case 9:
 					textBox.displayTextPane(10);
-					tutorial = 10;
+					tutorialProgress = 10;
 					break;
 				case 10:
 					textBox.displayTextPane(11);
-					tutorial = 11;
+					tutorialProgress = 11;
 					break;
 				case 11:
 					textBox.displayTextPane(12)
@@ -425,7 +423,7 @@ package {
 					canJump = true;
 					canAttack = true;
 					canMove = true;
-					tutorial = 13;
+					tutorialProgress = 13;
 					level.officer.gotoAndPlay(7);
 					level.missionRunners.play();
 					break;
@@ -437,7 +435,7 @@ package {
 					userInterface.itemIcon.visible = true;
 					textBox.displayTextPane(13);
 					userInterface.questIcon.visible = false
-					mission = 1
+					currentMission = 1
 					userInterface.pocketWatch.minute_hand_target.visible = true;
 					userInterface.pocketWatch.second_hand_target.visible = true;
 					userInterface.pocketWatch.second_hand_target.rotation = 21
@@ -490,7 +488,7 @@ package {
 			level.x = 319.6
 			level.y = -1355
 			textBox.displayTextPane(12);
-			mission = 0
+			currentMission = 0
 			textBox.hide()
 			canMove = true;
 			canJump = true;
@@ -521,7 +519,7 @@ package {
 			resetStamps();
 			resetGhosts();
 			level.teaCup.visible = false;
-			curLevel = L
+			currentLevel = L
 		}
 		
 		private function resetMissionObjects():void {
@@ -548,15 +546,15 @@ package {
 		}
 		
 		private function checkMissionDialougeCollision() {
-			if (curLevel == 1) {
-				if (level.missionRunners.currentFrame == mission * 180 + 102) {
+			if (currentLevel == 1) {
+				if (level.missionRunners.currentFrame == currentMission * 180 + 102) {
 					if (userInterface.questIcon.visible == false) {
 						questAlert()
 					}
 				}
 				if (player.hitBox.hitTestObject(level.lostAndFound.hitBox)) {
 					if (!collectedItem) {
-						if (level.missionRunners.currentFrame == mission * 180 + 102) {
+						if (level.missionRunners.currentFrame == currentMission * 180 + 102) {
 							if (userInterface.questIcon.visible == false) {
 								questAlert()
 							}
@@ -603,7 +601,7 @@ package {
 				level.map1.south_wing_btn.addEventListener(MouseEvent.CLICK, gotoSouthWing);
 				level.map1.west_wing_btn.addEventListener(MouseEvent.CLICK, gotoWestWing);
 			} else {
-				goToLevel(curLevel)
+				goToLevel(currentLevel)
 			}
 		}
 		
@@ -627,29 +625,29 @@ package {
 			goToLevel(5)
 		}
 		
-		private function goToLevel(L:int) {
-			level.gotoAndStop(L);
+		private function goToLevel(levelNumber:int) {
+			level.gotoAndStop(levelNumber);
 			player.addEventListener(Event.ENTER_FRAME, playerMove);
-			if (curLevel != L) {
-				curLevel = L
+			if (currentLevel != levelNumber) {
+				currentLevel = levelNumber
 				level.x = 319.6
 				level.y = -1358
 			} else {
 				level.x = savedX
 				level.y = savedY
 			}
-			if (curLevel != 1) {
+			if (currentLevel != 1) {
 				for (var i:uint = 0; i < level.mission_objects.numChildren; i++) {
 					level.mission_objects.getChildAt(i).visible = false;
 				}
-				if (curLevel == 5) {
+				if (currentLevel == 5) {
 					level.mission_objects.object_1.visible = true;
 				}
 			} else {
-				if (tutorial == 13) {
+				if (tutorialProgress == 13) {
 					level.officer.gotoAndStop(31);
 				}
-				if (mission == 1) {
+				if (currentMission == 1) {
 					level.missionRunners.gotoAndStop(104);
 				}
 			}
@@ -657,8 +655,8 @@ package {
 			player.visible = true
 		}
 		
-		private function collideMissionObjects() {
-			if (curLevel == 5 && level.mission_objects.object_1.visible) {
+		private function collideMissionObjects():void {
+			if (currentLevel == 5 && level.mission_objects.object_1.visible) {
 				if (player.hitBox.hitTestObject(level.mission_objects.object_1)) {
 					collectMissionObject();
 				}
@@ -671,7 +669,7 @@ package {
 			collectedItem = true;
 		}
 		
-		private function clock(TimerEvent) {
+		private function clock(event:TimerEvent):void {
 			if (userInterface.pocketWatch.second_hand.rotation == 21 && userInterface.pocketWatch.minute_hand.rotation == 111) {
 				if (textBox.currentTextPane < 14) {
 					textBox.show();
