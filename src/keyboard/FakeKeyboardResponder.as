@@ -1,26 +1,20 @@
 package keyboard {
-
-	public class FakeKeyboardResponder implements KeyboardResponder {
-		private var _functionLogger:Vector.<String> = new Vector.<String>()
-		
+	import test.FunctionCallLogger;
+	public class FakeKeyboardResponder extends FunctionCallLogger implements KeyboardResponder {
 		public function jump():void {
-			functionLogger.push("jump");
+			log(jump);
 		}
 		
 		public function checkForText():void {
-			functionLogger.push("checkForText");
+			log(checkForText);
 		}
 		
 		public function viewMap():void {
-			functionLogger.push("viewMap");
+			log(viewMap);
 		}
 		
 		public function attack():void {
-			functionLogger.push("attack");
-		}
-		
-		public function get functionLogger():Vector.<String> {
-			return _functionLogger;
+			log(attack);
 		}
 	}
 }
