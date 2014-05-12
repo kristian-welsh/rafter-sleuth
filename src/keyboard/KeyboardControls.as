@@ -12,11 +12,11 @@ package keyboard {
 		}
 		
 		public function startListening(dispatcher:IEventDispatcher):void {
-			dispatcher.addEventListener(KeyboardEvent.KEY_DOWN, checkKeyDown);
-			dispatcher.addEventListener(KeyboardEvent.KEY_UP, checkKeyUp);
+			dispatcher.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
+			dispatcher.addEventListener(KeyboardEvent.KEY_UP, keyUp);
 		}
 		
-		private function checkKeyDown(event:KeyboardEvent):void {
+		private function keyDown(event:KeyboardEvent):void {
 			if (event.keyCode == Keycode.LEFT_ARROW) {
 				_leftKeyDown = true;
 			}
@@ -28,7 +28,7 @@ package keyboard {
 			}
 		}
 		
-		private function checkKeyUp(event:KeyboardEvent):void {
+		private function keyUp(event:KeyboardEvent):void {
 			if (event.keyCode == Keycode.LEFT_ARROW) {
 				_leftKeyDown = false;
 			}
@@ -57,11 +57,11 @@ package keyboard {
 			return _rightKeyDown;
 		}
 		
-		public function get can_attack():Boolean {
+		public function get canAttack():Boolean {
 			return _can_attack;
 		}
 		
-		public function set can_attack(value:Boolean):void {
+		public function set canAttack(value:Boolean):void {
 			_can_attack = value;
 		}
 	}

@@ -4,7 +4,7 @@ package test {
 	
 	public class AllTests extends TestSuite {
 		public function AllTests() {
-			addTest(new KeyboardControlsTest("initial_values_are_correct"));
+			addTest(new KeyboardControlsTestSuite());
 		}
 	}
 }

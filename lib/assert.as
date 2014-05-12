@@ -1,6 +1,6 @@
 package {
 	public function assert(condition:Boolean, message:String):void {
 		if (!condition)
-			throw new Error(message);
+			throw new AssertionFailedError(message);
 	}
 }

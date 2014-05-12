@@ -29,12 +29,12 @@ package {
 		private var invincible:Boolean = false;
 		private var attacking:Boolean = false;
 		
-		//???
+		// combine variable and KeyboardControls::can_attack
 		private var canAttack:Boolean = false;
 		
-		private var canAdvanceText:Boolean = true;
 		private var canMove:Boolean = false;
 		private var canJump:Boolean = false;
+		private var canAdvanceText:Boolean = true;
 		private var collectedItem:Boolean = false;
 		private var mainSpeed:Number = 15;
 		private var jumpSpeed:Number = 0;
@@ -341,8 +341,8 @@ package {
 		}
 		
 		public function attack():void {
-			if (!attacking && grounded && keys.can_attack && canAttack) {
-				keys.can_attack = false;
+			if (!attacking && grounded && keys.canAttack && canAttack) {
+				keys.canAttack = false;
 				attacking = true;
 				var ghost:MovieClip;
 				for (var i:uint = 0; i < level.ghosts.numChildren; i++) {
