@@ -29,12 +29,12 @@ package {
 		private var invincible:Boolean = false;
 		private var attacking:Boolean = false;
 		
-		//???
+		// combine variable and KeyboardControls::can_attack
 		private var canAttack:Boolean = false;
 		
-		private var canAdvanceText:Boolean = true;
 		private var canMove:Boolean = false;
 		private var canJump:Boolean = false;
+		private var canAdvanceText:Boolean = true;
 		private var collectedItem:Boolean = false;
 		private var mainSpeed:Number = 15;
 		private var jumpSpeed:Number = 0;
