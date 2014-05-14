@@ -15,7 +15,10 @@ package test {
 			addTest(new KeyboardControlsTest("releasing_space_calls_jump_on_responder"));
 			addTest(new KeyboardControlsTest("releasing_enter_calls_checkForText_on_responder"));
 			addTest(new KeyboardControlsTest("releasing_m_calls_viewMap_on_responder"));
+<<<<<<< HEAD
 			addTest(new KeyboardControlsTest("pressing_or_releasing_any_other_key_does_nothing"));
+=======
+>>>>>>> 39b40a4e84924fe4b7559bba501856a3baee8db1
 		}
 	}
 }
