@@ -15,15 +15,12 @@ package {
 		static private const ATTACK_RADIUS:int = 175;
 		
 		private var userInterface:MovieClip;
-		private var level:MovieClip;
 		private var restartGameFunction:Function;
 		// cannot use stage.gotoAndPlay(1), so pass in a function from the timeline that does that
 		private var textBox:TextBox;
 		private var keys:KeyboardControls;
 		private var player:PlayerManager;
-		
-		private var savedX:Number;
-		private var savedY:Number;
+		private var levelManager:LevelManager;
 		
 		private var canAdvanceText:Boolean = true;
 		private var collectedItem:Boolean = false;
@@ -34,19 +31,18 @@ package {
 		private var life:int = 6;
 		private var currentMission:int = 0
 		private var tutorialProgress:int = 1;
-		private var currentLevel:int = 1;
 		private var missionSoundsChannel:SoundChannel = new SoundChannel();
 		private var questSound:Sound = new Bell_alert();
 		private var completeSound:Sound = new Mission_complete();
 		private var tocker:Timer = new Timer(1000);
 		
-		public function Main(ui:MovieClip, playerView:MovieClip, level:MovieClip, textDisplay:MovieClip, restartGameFunction:Function):void {
+		public function Main(ui:MovieClip, playerView:MovieClip, levelView:MovieClip, textDisplay:MovieClip, restartGameFunction:Function):void {
 			this.userInterface = ui;
-			this.level = level;
 			this.restartGameFunction = restartGameFunction;
 			textBox = new TextBox(textDisplay);
 			keys = new KeyboardControls(this);
 			player = new PlayerManager(playerView);
+			levelManager = new LevelManager(levelView);
 			super();
 		}
 		
@@ -104,7 +100,7 @@ package {
 					if (!collideH()) {
 						if (player.grounded)
 							player.displayWalkLeft();
-						level.x += walkSpeed;
+						levelManager.view.x += walkSpeed;
 					}
 					player.setLastDireciton("left");
 				}
@@ -112,7 +108,7 @@ package {
 					if (!collideH()) {
 						if (player.grounded)
 							player.displayWalkRight();
-						level.x -= walkSpeed;
+						levelManager.view.x -= walkSpeed;
 					}
 					player.setLastDireciton("right");
 				}
@@ -138,17 +134,17 @@ package {
 				jumpSpeed = -IMPULSE_SIZE;
 			}
 			jumpSpeed -= gravity;
-			level.y += jumpSpeed;
+			levelManager.view.y += jumpSpeed;
 		}
 		
 		/// Warning: both a command and a query
 		private function collideV():void {
-			for (var i:uint = 0; i < level.h_plats.numChildren; i++) {
-				if (player.view.x - PLAYER_RADIUS < level.h_plats.getChildAt(i).x + level.h_plats.x + level.x + 100) {
-					if (player.view.x + PLAYER_RADIUS > level.h_plats.getChildAt(i).x + level.h_plats.x + level.x) {
-						if (player.view.y < level.h_plats.getChildAt(i).y + level.h_plats.y + level.y) {
-							if (player.view.y - jumpSpeed > level.h_plats.getChildAt(i).y + level.h_plats.y + level.y) {
-								level.y = player.view.y - level.h_plats.y - level.h_plats.getChildAt(i).y + 1;
+			for (var i:uint = 0; i < levelManager.view.h_plats.numChildren; i++) {
+				if (player.view.x - PLAYER_RADIUS < levelManager.view.h_plats.getChildAt(i).x + levelManager.view.h_plats.x + levelManager.view.x + 100) {
+					if (player.view.x + PLAYER_RADIUS > levelManager.view.h_plats.getChildAt(i).x + levelManager.view.h_plats.x + levelManager.view.x) {
+						if (player.view.y < levelManager.view.h_plats.getChildAt(i).y + levelManager.view.h_plats.y + levelManager.view.y) {
+							if (player.view.y - jumpSpeed > levelManager.view.h_plats.getChildAt(i).y + levelManager.view.h_plats.y + levelManager.view.y) {
+								levelManager.view.y = player.view.y - levelManager.view.h_plats.y - levelManager.view.h_plats.getChildAt(i).y + 1;
 								player.grounded = true;
 								break;
 							}
@@ -156,7 +152,7 @@ package {
 					}
 				}
 			}
-			if (i == level.h_plats.numChildren) {
+			if (i == levelManager.view.h_plats.numChildren) {
 				player.fall();
 			}
 		}
@@ -164,13 +160,13 @@ package {
 		/// Warning: both a command and a query
 		private function collideH():Boolean {
 			var returnValue:Boolean;
-			for (var i:uint = 0; i < level.edge_plats.numChildren; i++) {
-				if (player.view.y > level.edge_plats.getChildAt(i).y + level.edge_plats.y + level.y) {
-					if (player.view.y - player.view.height < level.edge_plats.getChildAt(i).y + level.edge_plats.y + level.y + 100) {
+			for (var i:uint = 0; i < levelManager.view.edge_plats.numChildren; i++) {
+				if (player.view.y > levelManager.view.edge_plats.getChildAt(i).y + levelManager.view.edge_plats.y + levelManager.view.y) {
+					if (player.view.y - player.view.height < levelManager.view.edge_plats.getChildAt(i).y + levelManager.view.edge_plats.y + levelManager.view.y + 100) {
 						if (player.isFacingLeft()) {
-							if (player.view.x - PLAYER_RADIUS > level.edge_plats.getChildAt(i).x + level.edge_plats.x + level.x + 100) {
-								if (player.view.x - PLAYER_RADIUS - walkSpeed < level.edge_plats.getChildAt(i).x + level.edge_plats.x + level.x + 100) {
-									player.view.x = level.edge_plats.getChildAt(i).x + level.edge_plats.x + level.x + 100 + PLAYER_RADIUS + 1;
+							if (player.view.x - PLAYER_RADIUS > levelManager.view.edge_plats.getChildAt(i).x + levelManager.view.edge_plats.x + levelManager.view.x + 100) {
+								if (player.view.x - PLAYER_RADIUS - walkSpeed < levelManager.view.edge_plats.getChildAt(i).x + levelManager.view.edge_plats.x + levelManager.view.x + 100) {
+									player.view.x = levelManager.view.edge_plats.getChildAt(i).x + levelManager.view.edge_plats.x + levelManager.view.x + 100 + PLAYER_RADIUS + 1;
 									returnValue = true;
 									player.displayIdleLeft();
 									break;
@@ -178,9 +174,9 @@ package {
 							}
 						}
 						if (player.isFacingRight()) {
-							if (player.view.x + PLAYER_RADIUS < level.edge_plats.getChildAt(i).x + level.edge_plats.x + level.x) {
-								if (player.view.x + PLAYER_RADIUS + walkSpeed > level.edge_plats.getChildAt(i).x + level.edge_plats.x + level.x) {
-									player.view.x = level.edge_plats.getChildAt(i).x + level.edge_plats.x + level.x - PLAYER_RADIUS - 1;
+							if (player.view.x + PLAYER_RADIUS < levelManager.view.edge_plats.getChildAt(i).x + levelManager.view.edge_plats.x + levelManager.view.x) {
+								if (player.view.x + PLAYER_RADIUS + walkSpeed > levelManager.view.edge_plats.getChildAt(i).x + levelManager.view.edge_plats.x + levelManager.view.x) {
+									player.view.x = levelManager.view.edge_plats.getChildAt(i).x + levelManager.view.edge_plats.x + levelManager.view.x - PLAYER_RADIUS - 1;
 									returnValue = true;
 									player.displayIdleRight();
 									break;
@@ -190,7 +186,7 @@ package {
 					}
 				}
 			}
-			if (i == level.edge_plats.numChildren) {
+			if (i == levelManager.view.edge_plats.numChildren) {
 				returnValue = false;
 			}
 			return returnValue
@@ -198,10 +194,10 @@ package {
 		
 		private function collideStamps():void {
 			var stamp:MovieClip;
-			for (var i:uint = 0; i < level.stamps.numChildren; i++) {
-				stamp = level.stamps.getChildAt(i) as MovieClip;
+			for (var i:uint = 0; i < levelManager.view.stamps.numChildren; i++) {
+				stamp = levelManager.view.stamps.getChildAt(i) as MovieClip;
 				if (player.view.hitBox.hitTestObject(stamp)) {
-					level.stamps.removeChild(stamp);
+					Util.orphanDisplayObject(stamp);
 					score++;
 					userInterface.score_text.text = score.toString();
 				}
@@ -209,8 +205,9 @@ package {
 		}
 		
 		private function collideTea():void {
-			if (player.view.hitBox.hitTestObject(level.teaCup)) {
-				level.removeChild(level.teaCup);
+			var teaCup:MovieClip = levelManager.view.teaCup;
+			if (player.view.hitBox.hitTestObject(teaCup)) {
+				Util.orphanDisplayObject(teaCup);
 				life++
 				userInterface.teaPot.gotoAndStop(life + 1);
 			}
@@ -220,8 +217,8 @@ package {
 			player.updateInvincibility();
 			if (!player.invincible) {
 				var ghost:MovieClip;
-				for (var i:uint = 0; i < level.ghosts.numChildren; i++) {
-					ghost = level.ghosts.getChildAt(i) as MovieClip;
+				for (var i:uint = 0; i < levelManager.view.ghosts.numChildren; i++) {
+					ghost = levelManager.view.ghosts.getChildAt(i) as MovieClip;
 					if (player.view.hitBox.hitTestObject(ghost)) {
 						hurtPlayer();
 					}
@@ -253,10 +250,10 @@ package {
 				keys.canAttack = false;
 				player.attacking = true;
 				var ghost:MovieClip;
-				for (var i:uint = 0; i < level.ghosts.numChildren; i++) {
-					ghost = level.ghosts.getChildAt(i) as MovieClip;
+				for (var i:uint = 0; i < levelManager.view.ghosts.numChildren; i++) {
+					ghost = levelManager.view.ghosts.getChildAt(i) as MovieClip;
 					if (ghost.hitTestObject(player.view.attackHitBox)) {
-						level.ghosts.removeChild(ghost);
+						Util.orphanDisplayObject(ghost);
 					}
 				}
 				if (tutorialProgress == 4) {
@@ -332,8 +329,8 @@ package {
 					player.canAttack = true;
 					player.canMove = true;
 					tutorialProgress = 13;
-					level.officer.gotoAndPlay(7);
-					level.missionRunners.play();
+					levelManager.view.officer.gotoAndPlay(7);
+					levelManager.view.missionRunners.play();
 					break;
 				case 12:
 					textBox.hide();
@@ -350,7 +347,7 @@ package {
 					userInterface.pocketWatch.minute_hand_target.rotation = 111
 					break;
 				case 13:
-					level.missionRunners.play();
+					levelManager.view.missionRunners.play();
 					textBox.displayTextPane(14);
 					textBox.box.PlayAgain.addEventListener(MouseEvent.CLICK, gameWin);
 					break;
@@ -388,17 +385,10 @@ package {
 			score = 0;
 			life = 6
 			tocker.stop();
-			level.x = 319.6
-			level.y = -1355
-			level.officer.gotoAndPlay(7);
-			level.missionRunners.gotoAndPlay(2);
+			levelManager.reset();
 			textBox.displayTextPane(12);
 			textBox.hide()
-			player.canMove = true;
-			player.canJump = true;
-			player.canAttack = true;
-			player.invincible = false;
-			player.view.invincibility.gotoAndStop(1);
+			player.reset();
 			userInterface.score_text.text = 0;
 			userInterface.itemIcon.visible = false
 			userInterface.teaPot.gotoAndStop(life + 1);
@@ -409,32 +399,13 @@ package {
 		}
 		
 		private function resetLevel(levelNumber:int) {
-			level.gotoAndStop(levelNumber);
+			levelManager.enterLevel(levelNumber);
 			if (levelNumber != 1) {
-				resetMissionObjects();
+				levelManager.resetMissionObjects();
 			}
-			resetStamps();
-			resetGhosts();
-			level.teaCup.visible = false;
-			currentLevel = levelNumber
-		}
-		
-		private function resetMissionObjects():void {
-			for (var i:uint = 0; i < level.mission_objects.numChildren; i++) {
-				level.mission_objects.getChildAt(i).visible = false;
-			}
-		}
-		
-		private function resetStamps():void {
-			for (var i:uint = 0; i < level.stamps.numChildren; i++) {
-				level.stamps.getChildAt(i).visible = true
-			}
-		}
-		
-		private function resetGhosts():void {
-			for (var i:uint = 0; i < level.ghosts.numChildren; i++) {
-				level.ghosts.getChildAt(i).visible = true
-			}
+			levelManager.resetStamps();
+			levelManager.resetGhosts();
+			levelManager.currentLevel = levelNumber;
 		}
 		
 		private function questAlert() {
@@ -443,16 +414,16 @@ package {
 		}
 		
 		private function checkMissionDialougeCollision() {
-			if (currentLevel != 1)
+			if (levelManager.currentLevel != 1)
 				return;
-			if (level.missionRunners.currentFrame == currentMission * 180 + 102) {
+			if (levelManager.view.missionRunners.currentFrame == currentMission * 180 + 102) {
 				if (userInterface.questIcon.visible == false) {
 					questAlert()
 				}
 			}
-			if (player.view.hitBox.hitTestObject(level.lostAndFound.hitBox)) {
+			if (player.view.hitBox.hitTestObject(levelManager.view.lostAndFound.hitBox)) {
 				if (!collectedItem) {
-					if (level.missionRunners.currentFrame == currentMission * 180 + 102) {
+					if (levelManager.view.missionRunners.currentFrame == currentMission * 180 + 102) {
 						if (userInterface.questIcon.visible == false) {
 							questAlert()
 						}
@@ -461,10 +432,10 @@ package {
 				} else {
 					if (textBox.currentTextPane == 13) {
 						switchToText()
-						if (level.missionRunners.currentFrame != 105) {
+						if (levelManager.view.missionRunners.currentFrame != 105) {
 							missionSoundsChannel = completeSound.play();
 						}
-						level.missionRunners.gotoAndStop(105)
+						levelManager.view.missionRunners.gotoAndStop(105)
 					}
 				}
 			}
@@ -478,22 +449,18 @@ package {
 		}
 		
 		public function viewMap():void {
-			if (level.currentFrame < 17) {
+			if (levelManager.view.currentFrame < 17) {
 				player.view.removeEventListener(Event.ENTER_FRAME, playerMove);
 				player.view.visible = false;
 				userInterface.visible = false;
-				savedX = level.x
-				savedY = level.y
-				level.x = 0
-				level.y = 0
-				level.gotoAndStop(18);
-				level.map1.train_station_btn.addEventListener(MouseEvent.CLICK, gotoTrainStation);
-				level.map1.north_wing_btn.addEventListener(MouseEvent.CLICK, gotoNorthWing);
-				level.map1.east_wing_btn.addEventListener(MouseEvent.CLICK, gotoEastWing);
-				level.map1.south_wing_btn.addEventListener(MouseEvent.CLICK, gotoSouthWing);
-				level.map1.west_wing_btn.addEventListener(MouseEvent.CLICK, gotoWestWing);
+				levelManager.displayMap();
+				levelManager.view.map1.train_station_btn.addEventListener(MouseEvent.CLICK, function(e:Event) { goToLevel(1); } );
+				levelManager.view.map1.north_wing_btn.addEventListener(MouseEvent.CLICK, function(e:Event) { goToLevel(2); } );
+				levelManager.view.map1.east_wing_btn.addEventListener(MouseEvent.CLICK, function(e:Event) { goToLevel(3); } );
+				levelManager.view.map1.south_wing_btn.addEventListener(MouseEvent.CLICK, function(e:Event) { goToLevel(4); } );
+				levelManager.view.map1.west_wing_btn.addEventListener(MouseEvent.CLICK, function(e:Event) { goToLevel(5); } );
 			} else {
-				goToLevel(currentLevel)
+				goToLevel(levelManager.currentLevel)
 			}
 		}
 		
@@ -518,29 +485,14 @@ package {
 		}
 		
 		private function goToLevel(levelNumber:int) {
-			level.gotoAndStop(levelNumber);
 			player.view.addEventListener(Event.ENTER_FRAME, playerMove);
-			if (currentLevel != levelNumber) {
-				currentLevel = levelNumber
-				level.x = 319.6
-				level.y = -1358
-			} else {
-				level.x = savedX
-				level.y = savedY
-			}
-			if (currentLevel != 1) {
-				for (var i:uint = 0; i < level.mission_objects.numChildren; i++) {
-					level.mission_objects.getChildAt(i).visible = false;
-				}
-				if (currentLevel == 5) {
-					level.mission_objects.object_1.visible = true;
-				}
-			} else {
+			levelManager.goToLevel(levelNumber);
+			if (levelManager.currentLevel == 1) {
 				if (tutorialProgress == 13) {
-					level.officer.gotoAndStop(31);
+					levelManager.view.officer.gotoAndStop(31);
 				}
 				if (currentMission == 1) {
-					level.missionRunners.gotoAndStop(104);
+					levelManager.view.missionRunners.gotoAndStop(104);
 				}
 			}
 			userInterface.visible = true
@@ -548,15 +500,15 @@ package {
 		}
 		
 		private function collideMissionObjects():void {
-			if (currentLevel == 5 && level.mission_objects.object_1.visible) {
-				if (player.view.hitBox.hitTestObject(level.mission_objects.object_1)) {
+			if (levelManager.currentLevel == 5 && levelManager.view.mission_objects.object_1.visible) {
+				if (player.view.hitBox.hitTestObject(levelManager.view.mission_objects.object_1)) {
 					collectMissionObject();
 				}
 			}
 		}
 		
 		private function collectMissionObject():void {
-			level.mission_objects.object_1.visible = false;
+			levelManager.view.mission_objects.object_1.visible = false;
 			userInterface.itemIcon.visible = false;
 			collectedItem = true;
 		}
