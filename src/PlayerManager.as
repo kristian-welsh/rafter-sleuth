@@ -91,7 +91,7 @@ package {
 		}
 		
 		public function PlayerManager(view:MovieClip) {
-			this._view = view;
+			_view = view;
 		}
 		
 		public function shouldJump():Boolean {
@@ -196,6 +196,14 @@ package {
 		public function updateInvincibility():void {
 			if (view.invincibility.currentFrame == 1)
 				invincible = false;
+		}
+		
+		public function reset():void {
+			canMove = true;
+			canJump = true;
+			canAttack = true;
+			invincible = false;
+			view.invincibility.gotoAndStop(1);
 		}
 	}
 }

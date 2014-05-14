@@ -1,10 +1,11 @@
 package {
+	import flash.display.DisplayObject;
 	import flash.utils.describeType;
 	
 	public class Util {
 		/**
 		 * Finds the source name of callee (ie: called on some function foo it would return "foo")
-		 * This only works for public instance functions
+		 * This only works for public instance functions.
 		 * WARNING: REFLECTION
 		 * @param	callee The public instance function you want to find the name of.
 		 * @param	calleeOrigin The object (not class) that the function is defined on.
@@ -29,6 +30,14 @@ package {
 				if (foundItem == itemToFind)
 					return true;
 			return false;
+		}
+		
+		/**
+		 * Removes a displayObject from it's parent via removeChild.
+		 */
+		static public function orphanDisplayObject(displayObject:DisplayObject):void {
+			if (displayObject.parent)
+				displayObject.parent.removeChild(displayObject);
 		}
 	}
 }
