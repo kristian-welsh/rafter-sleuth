@@ -14,13 +14,14 @@ package {
 		static private const PLAYER_RADIUS:int = 45;
 		static private const ATTACK_RADIUS:int = 175;
 		
-		private var userInterface:MovieClip;
-		private var restartGameFunction:Function;
 		// cannot use stage.gotoAndPlay(1), so pass in a function from the timeline that does that
+		private var restartGameFunction:Function;
+		
 		private var textBox:TextBox;
 		private var keys:KeyboardControls;
 		private var player:PlayerManager;
 		private var level:LevelManager;
+		private var userInterfaceManager:UserInterfaceManager;
 		
 		private var canAdvanceText:Boolean = true;
 		private var collectedItem:Boolean = false;
@@ -36,28 +37,21 @@ package {
 		private var completeSound:Sound = new Mission_complete();
 		private var tocker:Timer = new Timer(1000);
 		
-		public function Main(ui:MovieClip, playerView:MovieClip, levelView:MovieClip, textDisplay:MovieClip, restartGameFunction:Function):void {
-			this.userInterface = ui;
+		public function Main(userInterfaceView:MovieClip, playerView:MovieClip, levelView:MovieClip, textDisplay:MovieClip, restartGameFunction:Function):void {
 			this.restartGameFunction = restartGameFunction;
 			textBox = new TextBox(textDisplay);
 			keys = new KeyboardControls(this);
 			player = new PlayerManager(playerView);
 			level = new LevelManager(levelView);
+			userInterfaceManager = new UserInterfaceManager(userInterfaceView);
 			super();
 		}
 		
 		public function startGame():void {
 			assert(stage != null, "Main needs to be added to the stage before calling startGame on it")
-			initializeUserInterface();
+			userInterfaceManager.displayLife(life);
+			userInterfaceManager.initialize();
 			addlisteners();
-		}
-		
-		private function initializeUserInterface():void {
-			userInterface.teaPot.gotoAndStop(life + 1);
-			userInterface.questIcon.visible = false;
-			userInterface.itemIcon.visible = false;
-			userInterface.pocketWatch.second_hand.rotation = 21
-			userInterface.pocketWatch.minute_hand.rotation = 21
 		}
 		
 		private function addlisteners():void {
@@ -199,7 +193,7 @@ package {
 				if (player.view.hitBox.hitTestObject(stamp)) {
 					Util.orphanDisplayObject(stamp);
 					score++;
-					userInterface.score_text.text = score.toString();
+					userInterfaceManager.displayScore(score);
 				}
 			}
 		}
@@ -209,7 +203,7 @@ package {
 			if (player.view.hitBox.hitTestObject(teaCup)) {
 				Util.orphanDisplayObject(teaCup);
 				life++
-				userInterface.teaPot.gotoAndStop(life + 1);
+				userInterfaceManager.displayLife(life);
 			}
 		}
 		
@@ -228,7 +222,7 @@ package {
 		
 		private function hurtPlayer():void {
 			life--;
-			userInterface.teaPot.gotoAndStop(life + 1);
+			userInterfaceManager.displayLife(life);
 			if (life == 0) {
 				killPlayer();
 			} else {
@@ -337,14 +331,9 @@ package {
 					player.canMove = true;
 					player.canJump = true;
 					player.canAttack = true;
-					userInterface.itemIcon.visible = true;
 					textBox.displayTextPane(13);
-					userInterface.questIcon.visible = false
+					userInterfaceManager.startMission();
 					currentMission = 1
-					userInterface.pocketWatch.minute_hand_target.visible = true;
-					userInterface.pocketWatch.second_hand_target.visible = true;
-					userInterface.pocketWatch.second_hand_target.rotation = 21
-					userInterface.pocketWatch.minute_hand_target.rotation = 111
 					break;
 				case 13:
 					level.view.missionRunners.play();
@@ -369,36 +358,32 @@ package {
 			}
 		}
 		
-		private function gameWin(MouseEvent) {
+		private function gameWin(MouseEvent):void {
 			resetGame();
 			player.view.removeEventListener(Event.ENTER_FRAME, playerMove);
 			tocker.removeEventListener(TimerEvent.TIMER, clock);
 			restartGameFunction();
 		}
 		
-		private function resetGame() {
+		private function resetGame():void {
 			for (var j:int = 5; j > 0; j--) {
 				resetLevel(j)
 			}
 			collectedItem = false
 			currentMission = 0
-			score = 0;
-			life = 6
 			tocker.stop();
-			level.reset();
 			textBox.displayTextPane(12);
 			textBox.hide()
+			level.reset();
 			player.reset();
-			userInterface.score_text.text = 0;
-			userInterface.itemIcon.visible = false
-			userInterface.teaPot.gotoAndStop(life + 1);
-			userInterface.pocketWatch.second_hand.rotation = 21
-			userInterface.pocketWatch.minute_hand.rotation = 21
-			userInterface.pocketWatch.minute_hand_target.visible = false;
-			userInterface.pocketWatch.second_hand_target.visible = false;
+			life = 6
+			userInterfaceManager.displayLife(life);
+			score = 0;
+			userInterfaceManager.displayScore(score);
+			userInterfaceManager.reset();
 		}
 		
-		private function resetLevel(levelNumber:int) {
+		private function resetLevel(levelNumber:int):void {
 			level.enterLevel(levelNumber);
 			if (levelNumber != 1) {
 				level.resetMissionObjects();
@@ -408,23 +393,23 @@ package {
 			level.currentLevel = levelNumber;
 		}
 		
-		private function questAlert() {
-			userInterface.questIcon.visible = true;
+		private function questAlert():void {
+			userInterfaceManager.showQuestIcon();
 			missionSoundsChannel = questSound.play();
 		}
 		
-		private function checkMissionDialougeCollision() {
+		private function checkMissionDialougeCollision():void {
 			if (level.currentLevel != 1)
 				return;
 			if (level.view.missionRunners.currentFrame == currentMission * 180 + 102) {
-				if (userInterface.questIcon.visible == false) {
+				if (!userInterfaceManager.isQuestIconVisible()) {
 					questAlert()
 				}
 			}
 			if (player.view.hitBox.hitTestObject(level.view.lostAndFound.hitBox)) {
 				if (!collectedItem) {
 					if (level.view.missionRunners.currentFrame == currentMission * 180 + 102) {
-						if (userInterface.questIcon.visible == false) {
+						if (!userInterfaceManager.isQuestIconVisible()) {
 							questAlert()
 						}
 						switchToText()
@@ -441,7 +426,7 @@ package {
 			}
 		}
 		
-		private function switchToText() {
+		private function switchToText():void {
 			player.displayIdle();
 			textBox.show();
 			player.freeze();
@@ -452,7 +437,7 @@ package {
 			if (level.view.currentFrame < 17) {
 				player.view.removeEventListener(Event.ENTER_FRAME, playerMove);
 				player.view.visible = false;
-				userInterface.visible = false;
+				userInterfaceManager.hideInterface();
 				level.displayMap();
 				level.view.map1.train_station_btn.addEventListener(MouseEvent.CLICK, function(e:Event) { goToLevel(1); } );
 				level.view.map1.north_wing_btn.addEventListener(MouseEvent.CLICK, function(e:Event) { goToLevel(2); } );
@@ -464,27 +449,7 @@ package {
 			}
 		}
 		
-		private function gotoTrainStation(event:MouseEvent) {
-			goToLevel(1);
-		}
-		
-		private function gotoNorthWing(event:MouseEvent) {
-			goToLevel(2)
-		}
-		
-		private function gotoEastWing(event:MouseEvent) {
-			goToLevel(3)
-		}
-		
-		private function gotoSouthWing(event:MouseEvent) {
-			goToLevel(4)
-		}
-		
-		private function gotoWestWing(event:MouseEvent) {
-			goToLevel(5)
-		}
-		
-		private function goToLevel(levelNumber:int) {
+		private function goToLevel(levelNumber:int):void {
 			player.view.addEventListener(Event.ENTER_FRAME, playerMove);
 			level.goToLevel(levelNumber);
 			if (level.currentLevel == 1) {
@@ -495,7 +460,7 @@ package {
 					level.view.missionRunners.gotoAndStop(104);
 				}
 			}
-			userInterface.visible = true
+			userInterfaceManager.showInterface();
 			player.view.visible = true
 		}
 		
@@ -509,23 +474,23 @@ package {
 		
 		private function collectMissionObject():void {
 			level.view.mission_objects.object_1.visible = false;
-			userInterface.itemIcon.visible = false;
+			userInterfaceManager.hideItemIcon();
 			collectedItem = true;
 		}
 		
 		private function clock(event:TimerEvent):void {
-			if (userInterface.pocketWatch.second_hand.rotation == 21 && userInterface.pocketWatch.minute_hand.rotation == 111) {
+			if (userInterfaceManager.view.pocketWatch.second_hand.rotation == 21 && userInterfaceManager.view.pocketWatch.minute_hand.rotation == 111) {
 				if (textBox.currentTextPane < 14) {
 					textBox.show();
 					player.freeze();
-					userInterface.itemIcon.visible = false;
 					textBox.displayTextPane(15);
-					userInterface.questIcon.visible = false;
+					userInterfaceManager.hideItemIcon();
+					userInterfaceManager.hideQuestIcon();
 				}
 			}
 			if (textBox.visible == false) {
-				userInterface.pocketWatch.second_hand.rotation += 6; //Second hand
-				userInterface.pocketWatch.minute_hand.rotation += 0.5; //Minute hand
+				userInterfaceManager.tickSecondHand();
+				userInterfaceManager.tickMinuteHand();
 			}
 		}
 	}
