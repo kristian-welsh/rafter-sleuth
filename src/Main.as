@@ -21,19 +21,11 @@ package {
 		// cannot use stage.gotoAndPlay(1) for some reason, so pass in a function from the timeline that does that
 		private var textBox:TextBox;
 		private var keys:KeyboardControls;
+		private var playerManager:PlayerManager;
 		
-		private var lastDir:String = "right";
 		private var savedX:Number;
 		private var savedY:Number;
-		private var grounded:Boolean = false;
-		private var invincible:Boolean = false;
-		private var attacking:Boolean = false;
 		
-		// combine variable and KeyboardControls::can_attack
-		private var canAttack:Boolean = false;
-		
-		private var canMove:Boolean = false;
-		private var canJump:Boolean = false;
 		private var canAdvanceText:Boolean = true;
 		private var collectedItem:Boolean = false;
 		private var mainSpeed:Number = 15;
@@ -57,6 +49,7 @@ package {
 			this.restartGameFunction = restartGameFunction;
 			textBox = new TextBox(textDisplay);
 			keys = new KeyboardControls(this);
+			playerManager = new PlayerManager(player);
 			super();
 		}
 		
@@ -83,12 +76,12 @@ package {
 		}
 		
 		private function shouldJump():Boolean {
-			return grounded && (!attacking) && canJump;
+			return playerManager.grounded && (!playerManager.attacking) && playerManager.canJump;
 		}
 		
 		public function jump():void {
 			if (shouldJump()) {
-				grounded = false;
+				playerManager.grounded = false;
 				jumpSpeed = 35;
 				if (tutorialProgress == 3) {
 					canAdvanceText = true;
@@ -104,7 +97,7 @@ package {
 			collideStamps();
 			collideTea();
 			collideGhosts();
-			checkAttackStatus();
+			playerManager.checkAttackStatus();
 			checkMissionDialougeCollision();
 			collideMissionObjects();
 			if (currentMission == 1) {
@@ -120,63 +113,33 @@ package {
 		}
 		
 		private function checkAttackStatus():void {
-			if (!attacking)
-				return;
-			if (playerIsFacing("right") && player.person.currentFrame != 7) {
-				player.attackHitBox.x = 0;
-				player.person.gotoAndStop("attackR");
-				player.person.attackRight.play();
-			}
-			if (playerIsFacing("left") && player.person.currentFrame != 8) {
-				player.attackHitBox.x = -200;
-				player.person.gotoAndStop("attackL");
-				player.person.attackLeft.play();
-			}
-			if (grounded) {
-				if (playerHasFinishedAttackingRight()) {
-					attacking = false;
-					player.person.attackRight.stop();
-				}
-				if (playerHasFinishedAttackingLeft()) {
-					attacking = false;
-					player.person.attackLeft.stop();
-				}
-			}
 		}
 		
 		private function playerIsFacing(direction:String):Boolean {
-			return lastDir == direction;
-		}
-		
-		private function playerHasFinishedAttackingRight():Boolean {
-			return player.person.currentFrame == 7 && player.person.attackRight.currentFrame == 12;
-		}
-		
-		private function playerHasFinishedAttackingLeft():Boolean {
-			return player.person.currentFrame == 8 && player.person.attackLeft.currentFrame == 12;
+			return playerManager.playerIsFacing(direction);
 		}
 		
 		private function moveLeftAndRight():void {
-			if (attacking)
+			if (playerManager.attacking)
 				return;
-			if (canMove) {
+			if (playerManager.canMove) {
 				if (keys.leftKeyDown && !keys.rightKeyDown) {
 					if (!collideH()) {
-						if (player.person.currentFrame != 4 && grounded) {
+						if (player.person.currentFrame != 4 && playerManager.grounded) {
 							player.person.gotoAndStop("walkL");
 						}
 						level.x += mainSpeed;
 					}
-					lastDir = "left";
+					playerManager.lastDir = "left";
 				}
 				if (keys.rightKeyDown && !keys.leftKeyDown) {
 					if (!collideH()) {
-						if (player.person.currentFrame != 3 && grounded) {
+						if (player.person.currentFrame != 3 && playerManager.grounded) {
 							player.person.gotoAndStop("walkR");
 						}
 						level.x -= mainSpeed;
 					}
-					lastDir = "right";
+					playerManager.lastDir = "right";
 				}
 				if ((keys.leftKeyDown || keys.rightKeyDown) && tutorialProgress == 2) {
 					canAdvanceText = true;
@@ -194,11 +157,11 @@ package {
 		}
 		
 		private function playerShouldBeIdle():Boolean {
-			return ((!keys.leftKeyDown && !keys.rightKeyDown) || (keys.leftKeyDown && keys.rightKeyDown)) && grounded
+			return ((!keys.leftKeyDown && !keys.rightKeyDown) || (keys.leftKeyDown && keys.rightKeyDown)) && playerManager.grounded
 		}
 		
 		private function fall():void {
-			if (grounded)
+			if (playerManager.grounded)
 				return;
 			if (playerIsFacing("right") && player.person.currentFrame != 5) {
 				player.person.gotoAndStop("jumpR");
@@ -220,7 +183,7 @@ package {
 						if (player.y < level.h_plats.getChildAt(i).y + level.h_plats.y + level.y) {
 							if (player.y - jumpSpeed > level.h_plats.getChildAt(i).y + level.h_plats.y + level.y) {
 								level.y = player.y - level.h_plats.y - level.h_plats.getChildAt(i).y + 1;
-								grounded = true;
+								playerManager.grounded = true;
 								break;
 							}
 						}
@@ -233,7 +196,7 @@ package {
 		}
 		
 		private function keepFalling():void {
-			grounded = false;
+			playerManager.grounded = false;
 			if (playerIsFacing("right") && player.currentFrame != 5) {
 				player.person.gotoAndStop("jumpR");
 			}
@@ -302,9 +265,9 @@ package {
 		
 		private function collideGhosts():void {
 			if (player.invincibility.currentFrame == 1) {
-				invincible = false;
+				playerManager.invincible = false;
 			}
-			if (!invincible) {
+			if (!playerManager.invincible) {
 				var ghost:MovieClip;
 				for (var i:uint = 0; i < level.ghosts.numChildren; i++) {
 					ghost = level.ghosts.getChildAt(i) as MovieClip;
@@ -321,7 +284,7 @@ package {
 			if (life == 0) {
 				killPlayer();
 			} else {
-				invincible = true;
+				playerManager.invincible = true;
 				if (!textBox.visible) {
 					player.invincibility.play();
 				}
@@ -335,15 +298,15 @@ package {
 		}
 		
 		private function freezePlayer():void {
-			canMove = false;
-			canJump = false;
-			canAttack = false;
+			playerManager.canMove = false;
+			playerManager.canJump = false;
+			playerManager.canAttack = false;
 		}
 		
 		public function attack():void {
-			if (!attacking && grounded && keys.canAttack && canAttack) {
+			if (!playerManager.attacking && playerManager.grounded && keys.canAttack && playerManager.canAttack) {
 				keys.canAttack = false;
-				attacking = true;
+				playerManager.attacking = true;
 				var ghost:MovieClip;
 				for (var i:uint = 0; i < level.ghosts.numChildren; i++) {
 					ghost = level.ghosts.getChildAt(i) as MovieClip;
@@ -365,7 +328,7 @@ package {
 				case 1:
 					textBox.displayTextPane(2);
 					tutorialProgress = 2;
-					canMove = true;
+					playerManager.canMove = true;
 					canAdvanceText = false;
 					break;
 				case 2:
@@ -373,8 +336,8 @@ package {
 						textBox.displayTextPane(3);
 						tutorialProgress = 3;
 						canAdvanceText = false;
-						canJump = true;
-						canMove = false;
+						playerManager.canJump = true;
+						playerManager.canMove = false;
 					}
 					break;
 				case 3:
@@ -382,15 +345,15 @@ package {
 						textBox.displayTextPane(4);
 						tutorialProgress = 4;
 						canAdvanceText = false;
-						canJump = false;
-						canAttack = true;
+						playerManager.canJump = false;
+						playerManager.canAttack = true;
 					}
 					break;
 				case 4:
 					if (canAdvanceText) {
 						textBox.displayTextPane(5);
 						tutorialProgress = 5;
-						canAttack = false;
+						playerManager.canAttack = false;
 					}
 					break;
 				case 5:
@@ -420,18 +383,18 @@ package {
 				case 11:
 					textBox.displayTextPane(12)
 					textBox.hide();
-					canJump = true;
-					canAttack = true;
-					canMove = true;
+					playerManager.canJump = true;
+					playerManager.canAttack = true;
+					playerManager.canMove = true;
 					tutorialProgress = 13;
 					level.officer.gotoAndPlay(7);
 					level.missionRunners.play();
 					break;
 				case 12:
 					textBox.hide();
-					canMove = true;
-					canJump = true;
-					canAttack = true;
+					playerManager.canMove = true;
+					playerManager.canJump = true;
+					playerManager.canAttack = true;
 					userInterface.itemIcon.visible = true;
 					textBox.displayTextPane(13);
 					userInterface.questIcon.visible = false
@@ -448,9 +411,9 @@ package {
 					break;
 				case 14:
 					textBox.hide()
-					canMove = true;
-					canJump = true;
-					canAttack = true;
+					playerManager.canMove = true;
+					playerManager.canJump = true;
+					playerManager.canAttack = true;
 					break;
 				case 15:
 					fadeOut();
@@ -490,9 +453,9 @@ package {
 			textBox.displayTextPane(12);
 			currentMission = 0
 			textBox.hide()
-			canMove = true;
-			canJump = true;
-			canAttack = true;
+			playerManager.canMove = true;
+			playerManager.canJump = true;
+			playerManager.canAttack = true;
 			level.officer.gotoAndStop(31)
 			userInterface.itemIcon.visible = false
 			collectedItem = false
@@ -507,7 +470,7 @@ package {
 			userInterface.pocketWatch.second_hand_target.visible = false;
 			life = 6
 			userInterface.teaPot.gotoAndStop(life + 1);
-			invincible = false;
+			playerManager.invincible = false;
 			player.invincibility.gotoAndStop(1)
 		}
 		
