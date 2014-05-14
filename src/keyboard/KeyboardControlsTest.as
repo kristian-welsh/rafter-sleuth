@@ -4,7 +4,7 @@ package keyboard {
 	import flash.events.KeyboardEvent;
 	
 	public class KeyboardControlsTest extends TestCase {
-		private var responder:FakeKeyboardResponder;
+		private var responder:KeyboardResponderSpy;
 		private var controls:KeyboardControls;
 		private var dispatcher:EventDispatcher;
 		
@@ -13,7 +13,7 @@ package keyboard {
 		}
 		
 		override protected function setUp():void {
-			responder = new FakeKeyboardResponder();
+			responder = new KeyboardResponderSpy();
 			controls = new KeyboardControls(responder);
 			dispatcher = new EventDispatcher();
 			controls.startListening(dispatcher);
