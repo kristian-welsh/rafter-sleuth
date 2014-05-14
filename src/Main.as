@@ -21,19 +21,11 @@ package {
 		// cannot use stage.gotoAndPlay(1) for some reason, so pass in a function from the timeline that does that
 		private var textBox:TextBox;
 		private var keys:KeyboardControls;
+		private var playerManager:PlayerManager;
 		
-		private var lastDir:String = "right";
 		private var savedX:Number;
 		private var savedY:Number;
-		private var grounded:Boolean = false;
-		private var invincible:Boolean = false;
-		private var attacking:Boolean = false;
 		
-		// combine variable and KeyboardControls::can_attack
-		private var canAttack:Boolean = false;
-		
-		private var canMove:Boolean = false;
-		private var canJump:Boolean = false;
 		private var canAdvanceText:Boolean = true;
 		private var collectedItem:Boolean = false;
 		private var mainSpeed:Number = 15;
@@ -57,6 +49,7 @@ package {
 			this.restartGameFunction = restartGameFunction;
 			textBox = new TextBox(textDisplay);
 			keys = new KeyboardControls(this);
+			playerManager = new PlayerManager(player);
 			super();
 		}
 		
@@ -72,8 +65,6 @@ package {
 			userInterface.itemIcon.visible = false;
 			userInterface.pocketWatch.second_hand.rotation = 21
 			userInterface.pocketWatch.minute_hand.rotation = 21
-			//private var fadeToBlack:MovieClip = fade_to_black as MovieClip;
-			//removeChild(fadeToBlack);
 		}
 		
 		private function addlisteners():void {
@@ -82,13 +73,9 @@ package {
 			tocker.addEventListener(TimerEvent.TIMER, clock);
 		}
 		
-		private function shouldJump():Boolean {
-			return grounded && (!attacking) && canJump;
-		}
-		
 		public function jump():void {
-			if (shouldJump()) {
-				grounded = false;
+			if (playerManager.shouldJump()) {
+				playerManager.grounded = false;
 				jumpSpeed = 35;
 				if (tutorialProgress == 3) {
 					canAdvanceText = true;
@@ -104,79 +91,35 @@ package {
 			collideStamps();
 			collideTea();
 			collideGhosts();
-			checkAttackStatus();
+			playerManager.checkAttackStatus();
 			checkMissionDialougeCollision();
 			collideMissionObjects();
 			if (currentMission == 1) {
 				tocker.start();
 			}
-		/*
-		   if(stage.contains(fadeToBlack)) {
-		   if(fadeToBlack.currentFrame==18) {
-		   resetGame();
-		   removeChild(fadeToBlack);
-		   }
-		 }*/
-		}
-		
-		private function checkAttackStatus():void {
-			if (!attacking)
-				return;
-			if (playerIsFacing("right") && player.person.currentFrame != 7) {
-				player.attackHitBox.x = 0;
-				player.person.gotoAndStop("attackR");
-				player.person.attackRight.play();
-			}
-			if (playerIsFacing("left") && player.person.currentFrame != 8) {
-				player.attackHitBox.x = -200;
-				player.person.gotoAndStop("attackL");
-				player.person.attackLeft.play();
-			}
-			if (grounded) {
-				if (playerHasFinishedAttackingRight()) {
-					attacking = false;
-					player.person.attackRight.stop();
-				}
-				if (playerHasFinishedAttackingLeft()) {
-					attacking = false;
-					player.person.attackLeft.stop();
-				}
-			}
-		}
-		
-		private function playerIsFacing(direction:String):Boolean {
-			return lastDir == direction;
-		}
-		
-		private function playerHasFinishedAttackingRight():Boolean {
-			return player.person.currentFrame == 7 && player.person.attackRight.currentFrame == 12;
-		}
-		
-		private function playerHasFinishedAttackingLeft():Boolean {
-			return player.person.currentFrame == 8 && player.person.attackLeft.currentFrame == 12;
 		}
 		
 		private function moveLeftAndRight():void {
-			if (attacking)
+			if (playerManager.attacking)
 				return;
-			if (canMove) {
+			if (playerManager.canMove) {
 				if (keys.leftKeyDown && !keys.rightKeyDown) {
 					if (!collideH()) {
-						if (player.person.currentFrame != 4 && grounded) {
+						if (player.person.currentFrame != 4 && playerManager.grounded) {
 							player.person.gotoAndStop("walkL");
 						}
 						level.x += mainSpeed;
 					}
-					lastDir = "left";
+					playerManager.lastDir = "left";
 				}
 				if (keys.rightKeyDown && !keys.leftKeyDown) {
 					if (!collideH()) {
-						if (player.person.currentFrame != 3 && grounded) {
+						if (player.person.currentFrame != 3 && playerManager.grounded) {
 							player.person.gotoAndStop("walkR");
 						}
 						level.x -= mainSpeed;
 					}
-					lastDir = "right";
+					playerManager.lastDir = "right";
 				}
 				if ((keys.leftKeyDown || keys.rightKeyDown) && tutorialProgress == 2) {
 					canAdvanceText = true;
@@ -184,26 +127,26 @@ package {
 				}
 			}
 			if (playerShouldBeIdle()) {
-				if (playerIsFacing("right") && player.person.currentFrame != 1) {
+				if (playerManager.playerIsFacing("right") && player.person.currentFrame != 1) {
 					player.person.gotoAndStop("idleR");
 				}
-				if (playerIsFacing("left") && player.person.currentFrame != 2) {
+				if (playerManager.playerIsFacing("left") && player.person.currentFrame != 2) {
 					player.person.gotoAndStop("idleL");
 				}
 			}
 		}
 		
 		private function playerShouldBeIdle():Boolean {
-			return ((!keys.leftKeyDown && !keys.rightKeyDown) || (keys.leftKeyDown && keys.rightKeyDown)) && grounded
+			return ((!keys.leftKeyDown && !keys.rightKeyDown) || (keys.leftKeyDown && keys.rightKeyDown)) && playerManager.grounded
 		}
 		
 		private function fall():void {
-			if (grounded)
+			if (playerManager.grounded)
 				return;
-			if (playerIsFacing("right") && player.person.currentFrame != 5) {
+			if (playerManager.playerIsFacing("right") && player.person.currentFrame != 5) {
 				player.person.gotoAndStop("jumpR");
 			}
-			if (playerIsFacing("left") && player.person.currentFrame != 6) {
+			if (playerManager.playerIsFacing("left") && player.person.currentFrame != 6) {
 				player.person.gotoAndStop("jumpL");
 			}
 			if (jumpSpeed - gravity < -IMPULSE_SIZE) {
@@ -220,7 +163,7 @@ package {
 						if (player.y < level.h_plats.getChildAt(i).y + level.h_plats.y + level.y) {
 							if (player.y - jumpSpeed > level.h_plats.getChildAt(i).y + level.h_plats.y + level.y) {
 								level.y = player.y - level.h_plats.y - level.h_plats.getChildAt(i).y + 1;
-								grounded = true;
+								playerManager.grounded = true;
 								break;
 							}
 						}
@@ -233,11 +176,11 @@ package {
 		}
 		
 		private function keepFalling():void {
-			grounded = false;
-			if (playerIsFacing("right") && player.currentFrame != 5) {
+			playerManager.grounded = false;
+			if (playerManager.playerIsFacing("right") && player.currentFrame != 5) {
 				player.person.gotoAndStop("jumpR");
 			}
-			if (playerIsFacing("left") && player.currentFrame != 6) {
+			if (playerManager.playerIsFacing("left") && player.currentFrame != 6) {
 				player.person.gotoAndStop("jumpL");
 			}
 		}
@@ -302,9 +245,9 @@ package {
 		
 		private function collideGhosts():void {
 			if (player.invincibility.currentFrame == 1) {
-				invincible = false;
+				playerManager.invincible = false;
 			}
-			if (!invincible) {
+			if (!playerManager.invincible) {
 				var ghost:MovieClip;
 				for (var i:uint = 0; i < level.ghosts.numChildren; i++) {
 					ghost = level.ghosts.getChildAt(i) as MovieClip;
@@ -321,7 +264,7 @@ package {
 			if (life == 0) {
 				killPlayer();
 			} else {
-				invincible = true;
+				playerManager.invincible = true;
 				if (!textBox.visible) {
 					player.invincibility.play();
 				}
@@ -335,15 +278,15 @@ package {
 		}
 		
 		private function freezePlayer():void {
-			canMove = false;
-			canJump = false;
-			canAttack = false;
+			playerManager.canMove = false;
+			playerManager.canJump = false;
+			playerManager.canAttack = false;
 		}
 		
 		public function attack():void {
-			if (!attacking && grounded && keys.canAttack && canAttack) {
+			if (!playerManager.attacking && playerManager.grounded && keys.canAttack && playerManager.canAttack) {
 				keys.canAttack = false;
-				attacking = true;
+				playerManager.attacking = true;
 				var ghost:MovieClip;
 				for (var i:uint = 0; i < level.ghosts.numChildren; i++) {
 					ghost = level.ghosts.getChildAt(i) as MovieClip;
@@ -365,7 +308,7 @@ package {
 				case 1:
 					textBox.displayTextPane(2);
 					tutorialProgress = 2;
-					canMove = true;
+					playerManager.canMove = true;
 					canAdvanceText = false;
 					break;
 				case 2:
@@ -373,8 +316,8 @@ package {
 						textBox.displayTextPane(3);
 						tutorialProgress = 3;
 						canAdvanceText = false;
-						canJump = true;
-						canMove = false;
+						playerManager.canJump = true;
+						playerManager.canMove = false;
 					}
 					break;
 				case 3:
@@ -382,15 +325,15 @@ package {
 						textBox.displayTextPane(4);
 						tutorialProgress = 4;
 						canAdvanceText = false;
-						canJump = false;
-						canAttack = true;
+						playerManager.canJump = false;
+						playerManager.canAttack = true;
 					}
 					break;
 				case 4:
 					if (canAdvanceText) {
 						textBox.displayTextPane(5);
 						tutorialProgress = 5;
-						canAttack = false;
+						playerManager.canAttack = false;
 					}
 					break;
 				case 5:
@@ -420,18 +363,18 @@ package {
 				case 11:
 					textBox.displayTextPane(12)
 					textBox.hide();
-					canJump = true;
-					canAttack = true;
-					canMove = true;
+					playerManager.canJump = true;
+					playerManager.canAttack = true;
+					playerManager.canMove = true;
 					tutorialProgress = 13;
 					level.officer.gotoAndPlay(7);
 					level.missionRunners.play();
 					break;
 				case 12:
 					textBox.hide();
-					canMove = true;
-					canJump = true;
-					canAttack = true;
+					playerManager.canMove = true;
+					playerManager.canJump = true;
+					playerManager.canAttack = true;
 					userInterface.itemIcon.visible = true;
 					textBox.displayTextPane(13);
 					userInterface.questIcon.visible = false
@@ -448,30 +391,20 @@ package {
 					break;
 				case 14:
 					textBox.hide()
-					canMove = true;
-					canJump = true;
-					canAttack = true;
+					playerManager.canMove = true;
+					playerManager.canJump = true;
+					playerManager.canAttack = true;
 					break;
 				case 15:
-					fadeOut();
+					// end game
 					break;
 				case 16:
 					textBox.displayTextPane(17);
 					break;
 				case 17:
-					fadeOut();
+					// end game
 					break;
 			}
-		}
-		
-		// fade_to_black didn't word when i resurected the project
-		// I will probably re-write the functionality from scratch later
-		private function fadeOut() {
-		/*
-		   addChild(fadeToBlack);
-		   fadeToBlack.x=0;
-		   fadeToBlack.y=0;
-		 fadeToBlack.play();*/
 		}
 		
 		private function gameWin(MouseEvent) {
@@ -483,43 +416,42 @@ package {
 		
 		private function resetGame() {
 			for (j = 5; j > 0; j--) {
-				resetLevels(j)
+				resetLevel(j)
 			}
+			collectedItem = false
+			currentMission = 0
+			score = 0;
+			life = 6
+			tocker.stop();
 			level.x = 319.6
 			level.y = -1355
-			textBox.displayTextPane(12);
-			currentMission = 0
-			textBox.hide()
-			canMove = true;
-			canJump = true;
-			canAttack = true;
-			level.officer.gotoAndStop(31)
-			userInterface.itemIcon.visible = false
-			collectedItem = false
 			level.officer.gotoAndPlay(7);
 			level.missionRunners.gotoAndPlay(2);
+			textBox.displayTextPane(12);
+			textBox.hide()
+			playerManager.canMove = true;
+			playerManager.canJump = true;
+			playerManager.canAttack = true;
+			playerManager.invincible = false;
+			player.invincibility.gotoAndStop(1);
+			userInterface.score_text.text = 0;
+			userInterface.itemIcon.visible = false
+			userInterface.teaPot.gotoAndStop(life + 1);
 			userInterface.pocketWatch.second_hand.rotation = 21
 			userInterface.pocketWatch.minute_hand.rotation = 21
-			tocker.stop();
-			score = 0;
-			userInterface.score_text.text = 0;
 			userInterface.pocketWatch.minute_hand_target.visible = false;
 			userInterface.pocketWatch.second_hand_target.visible = false;
-			life = 6
-			userInterface.teaPot.gotoAndStop(life + 1);
-			invincible = false;
-			player.invincibility.gotoAndStop(1)
 		}
 		
-		private function resetLevels(L:int) {
-			level.gotoAndStop(L);
-			if (L != 1) {
+		private function resetLevel(levelNumber:int) {
+			level.gotoAndStop(levelNumber);
+			if (levelNumber != 1) {
 				resetMissionObjects();
 			}
 			resetStamps();
 			resetGhosts();
 			level.teaCup.visible = false;
-			currentLevel = L
+			currentLevel = levelNumber
 		}
 		
 		private function resetMissionObjects():void {
@@ -546,38 +478,38 @@ package {
 		}
 		
 		private function checkMissionDialougeCollision() {
-			if (currentLevel == 1) {
-				if (level.missionRunners.currentFrame == currentMission * 180 + 102) {
-					if (userInterface.questIcon.visible == false) {
-						questAlert()
-					}
+			if (currentLevel != 1)
+				return;
+			if (level.missionRunners.currentFrame == currentMission * 180 + 102) {
+				if (userInterface.questIcon.visible == false) {
+					questAlert()
 				}
-				if (player.hitBox.hitTestObject(level.lostAndFound.hitBox)) {
-					if (!collectedItem) {
-						if (level.missionRunners.currentFrame == currentMission * 180 + 102) {
-							if (userInterface.questIcon.visible == false) {
-								questAlert()
-							}
-							switchToText()
+			}
+			if (player.hitBox.hitTestObject(level.lostAndFound.hitBox)) {
+				if (!collectedItem) {
+					if (level.missionRunners.currentFrame == currentMission * 180 + 102) {
+						if (userInterface.questIcon.visible == false) {
+							questAlert()
 						}
-					} else {
-						if (textBox.currentTextPane == 13) {
-							switchToText()
-							if (level.missionRunners.currentFrame != 105) {
-								missionSoundsChannel = completeSound.play();
-							}
-							level.missionRunners.gotoAndStop(105)
+						switchToText()
+					}
+				} else {
+					if (textBox.currentTextPane == 13) {
+						switchToText()
+						if (level.missionRunners.currentFrame != 105) {
+							missionSoundsChannel = completeSound.play();
 						}
+						level.missionRunners.gotoAndStop(105)
 					}
 				}
 			}
 		}
 		
 		private function switchToText() {
-			if (playerIsFacing("right")) {
+			if (playerManager.playerIsFacing("right")) {
 				player.person.gotoAndStop("idleR");
 			}
-			if (playerIsFacing("left")) {
+			if (playerManager.playerIsFacing("left")) {
 				player.person.gotoAndStop("idleL");
 			}
 			textBox.show();
@@ -588,13 +520,13 @@ package {
 		public function viewMap():void {
 			if (level.currentFrame < 17) {
 				player.removeEventListener(Event.ENTER_FRAME, playerMove);
-				level.gotoAndStop(18);
+				player.visible = false;
+				userInterface.visible = false;
 				savedX = level.x
 				savedY = level.y
 				level.x = 0
 				level.y = 0
-				userInterface.visible = false;
-				player.visible = false;
+				level.gotoAndStop(18);
 				level.map1.train_station_btn.addEventListener(MouseEvent.CLICK, gotoTrainStation);
 				level.map1.north_wing_btn.addEventListener(MouseEvent.CLICK, gotoNorthWing);
 				level.map1.east_wing_btn.addEventListener(MouseEvent.CLICK, gotoEastWing);
@@ -606,7 +538,7 @@ package {
 		}
 		
 		private function gotoTrainStation(event:MouseEvent) {
-			goToLevel(1)
+			goToLevel(1);
 		}
 		
 		private function gotoNorthWing(event:MouseEvent) {
