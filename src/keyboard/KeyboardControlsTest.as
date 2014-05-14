@@ -20,13 +20,10 @@ package keyboard {
 		}
 		
 		public function initial_values_are_correct():void {
-<<<<<<< HEAD
 			assertInitialValues();
 		}
 		
 		private function assertInitialValues():void {
-=======
->>>>>>> 39b40a4e84924fe4b7559bba501856a3baee8db1
 			assertTrue(controls.canAttack)
 			assertTrue(!controls.leftKeyDown)
 			assertTrue(!controls.rightKeyDown)
@@ -87,7 +84,6 @@ package keyboard {
 			responder.assertCalled(responder.viewMap);
 		}
 		
-<<<<<<< HEAD
 		public function pressing_or_releasing_any_other_key_does_nothing():void {
 			pressKey(555);
 			assertInitialValues();
@@ -96,8 +92,6 @@ package keyboard {
 			responder.assertNotUsed();
 		}
 		
-=======
->>>>>>> 39b40a4e84924fe4b7559bba501856a3baee8db1
 		private function pressKey(keyCode:uint):void {
 			var event:KeyboardEvent = new KeyboardEvent(KeyboardEvent.KEY_DOWN)
 			event.keyCode = keyCode
@@ -107,11 +101,6 @@ package keyboard {
 		private function releaseKey(keyCode:uint):void {
 			var event:KeyboardEvent = new KeyboardEvent(KeyboardEvent.KEY_UP)
 			event.keyCode = keyCode
-			dispatcher.dispatchEvent(event);
-		}
-		
-		private function releaseKey(keyCode:uint):void {
-			var event:KeyboardEvent = new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, keyCode)
 			dispatcher.dispatchEvent(event);
 		}
 	}
