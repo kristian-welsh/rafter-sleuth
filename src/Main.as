@@ -2,8 +2,7 @@ package {
 	import flash.display.*;
 	import flash.events.*;
 	import flash.media.*;
-	import flash.utils.Timer;
-	import flash.display.Sprite;
+	import flash.utils.*;
 	import keyboard.*;
 	
 	// BUG: if you use the map before the mission giver gets to the stand, the mission giver never shows up

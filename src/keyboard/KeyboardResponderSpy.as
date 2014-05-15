@@ -1,21 +1,27 @@
 package keyboard {
 	import test.Spy;
 	
-	public class KeyboardResponderSpy extends Spy implements KeyboardResponder {
+	public class KeyboardResponderSpy implements KeyboardResponder {
+		var _spy:Spy = new Spy();
+		
 		public function jump():void {
-			log(jump);
+			_spy.log(jump);
 		}
 		
 		public function checkForText():void {
-			log(checkForText);
+			_spy.log(checkForText);
 		}
 		
 		public function viewMap():void {
-			log(viewMap);
+			_spy.log(viewMap);
 		}
 		
 		public function attack():void {
-			log(attack);
+			_spy.log(attack);
+		}
+		
+		public function get spy():Spy {
+			return _spy;
 		}
 	}
 }

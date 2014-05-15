@@ -5,21 +5,21 @@ package test {
 		private var functionLog:Vector.<Function> = new Vector.<Function>();
 		
 		/**
-		 * Log each function call, then assert on whether a function was called or not.
+		 * Log function calls, then assert on whether a function was called or not.
 		 */
 		public function Spy() {
 			super();
 		}
 		
 		/**
-		 * @param	functionCalled A referance to the function that has been called on the spy
+		 * @param	functionCalled A referance to the function that has been called.
 		 */
-		protected function log(functionCalled:Function):void {
+		public function log(functionCalled:Function):void {
 			functionLog.push(functionCalled);
 		}
 		
 		/**
-		 * Asserts that the funciton was logged from the subclass.
+		 * Asserts that the funciton has been logged.
 		 */
 		public function assertCalled(functionExpected:Function):void {
 			if (!Util.listContainsItem(functionLog, functionExpected))
@@ -27,7 +27,7 @@ package test {
 		}
 		
 		/**
-		 * Asserts that the funciton was never logged from the subclass.
+		 * Asserts that the funciton has not been logged.
 		 */
 		public function assertNotCalled(functionExpected:Function):void {
 			if (Util.listContainsItem(functionLog, functionExpected))
@@ -35,7 +35,7 @@ package test {
 		}
 		
 		/**
-		 * Asserts that no funciton was ever logged from the subclass.
+		 * Asserts that no funciton has been logged.
 		 */
 		public function assertNotUsed():void {
 			if (functionLog.length != 0)

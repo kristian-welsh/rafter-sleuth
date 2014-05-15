@@ -60,7 +60,7 @@ package keyboard {
 		
 		public function pressing_shift_calls_attack_on_responder():void {
 			pressKey(Keycode.SHIFT);
-			responder.assertCalled(responder.attack);
+			responder.spy.assertCalled(responder.attack);
 		}
 		
 		public function releasing_shift_makes_canAttack_true():void {
@@ -71,17 +71,17 @@ package keyboard {
 		
 		public function releasing_space_calls_jump_on_responder():void {
 			releaseKey(Keycode.SPACEBAR);
-			responder.assertCalled(responder.jump);
+			responder.spy.assertCalled(responder.jump);
 		}
 		
 		public function releasing_enter_calls_checkForText_on_responder():void {
 			releaseKey(Keycode.ENTER);
-			responder.assertCalled(responder.checkForText);
+			responder.spy.assertCalled(responder.checkForText);
 		}
 		
 		public function releasing_m_calls_viewMap_on_responder():void {
 			releaseKey(Keycode.M);
-			responder.assertCalled(responder.viewMap);
+			responder.spy.assertCalled(responder.viewMap);
 		}
 		
 		public function pressing_or_releasing_any_other_key_does_nothing():void {
@@ -89,7 +89,7 @@ package keyboard {
 			assertInitialValues();
 			releaseKey(555);
 			assertInitialValues();
-			responder.assertNotUsed();
+			responder.spy.assertNotUsed();
 		}
 		
 		private function pressKey(keyCode:uint):void {
