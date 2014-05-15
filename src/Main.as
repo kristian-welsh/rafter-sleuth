@@ -21,6 +21,7 @@ package {
 		private var player:PlayerManager;
 		private var level:LevelManager;
 		private var userInterfaceManager:UserInterfaceManager;
+		private var _console:Console;
 		
 		private var canAdvanceText:Boolean = true;
 		private var collectedItem:Boolean = false;
@@ -36,13 +37,13 @@ package {
 		private var completeSound:Sound = new Mission_complete();
 		private var tocker:Timer = new Timer(1000);
 		
-		public function Main(userInterfaceView:MovieClip, playerView:MovieClip, levelView:MovieClip, textDisplay:MovieClip, restartGameFunction:Function):void {
+		public function Main(userInterfaceGraphics:MovieClip, playerView:MovieClip, levelView:MovieClip, textDisplay:MovieClip, restartGameFunction:Function):void {
 			this.restartGameFunction = restartGameFunction;
 			textBox = new TextBox(textDisplay);
 			keys = new KeyboardControls(this);
 			player = new PlayerManager(playerView);
 			level = new LevelManager(levelView);
-			userInterfaceManager = new UserInterfaceManager(userInterfaceView);
+			userInterfaceManager = new UserInterfaceManager(userInterfaceGraphics, new UserInterfaceView(userInterfaceGraphics));
 			super();
 		}
 		
@@ -51,6 +52,7 @@ package {
 			userInterfaceManager.displayLife(life);
 			userInterfaceManager.initialize();
 			addlisteners();
+			_console = new Console(stage);
 		}
 		
 		private function addlisteners():void {
@@ -477,8 +479,9 @@ package {
 			collectedItem = true;
 		}
 		
+		// BUG: values 21 and 111 and the greater than comparison are probably slightly off.
 		private function clock(event:TimerEvent):void {
-			if (userInterfaceManager.view.pocketWatch.second_hand.rotation == 21 && userInterfaceManager.view.pocketWatch.minute_hand.rotation == 111) {
+			if (userInterfaceManager.graphics.pocketWatch.second_hand.rotation > 21 && userInterfaceManager.graphics.pocketWatch.minute_hand.rotation > 111) {
 				if (textBox.currentTextPane < 14) {
 					textBox.show();
 					player.freeze();

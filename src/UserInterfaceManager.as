@@ -2,83 +2,83 @@ package  {
 	import flash.display.MovieClip;
 
 	public class UserInterfaceManager {
-		private var _view:MovieClip;
+		private var _graphics:MovieClip;
+		private var _view:UserInterfaceView;
 		
-		public function UserInterfaceManager(view:MovieClip) {
+		public function UserInterfaceManager(graphics:MovieClip, view:UserInterfaceView) {
+			_graphics = graphics;
 			_view = view;
 		}
 		
 		public function initialize():void {
-			hideItemIcon();
-			hideQuestIcon();
-			view.pocketWatch.second_hand.rotation = 21;
-			view.pocketWatch.minute_hand.rotation = 21;
+			_view.hideItemIcon();
+			_view.hideQuestIcon();
+			_view.setMinuteHandRotation(21);
+			_view.setSecondHandRotation(21);
 		}
 		
 		public function displayScore(score:int):void {
-			view.score_text.text = score.toString();
+			_view.setScore(score);
 		}
 		
 		public function displayLife(life:int):void {
-			view.teaPot.gotoAndStop(life + 1);
+			_view.SetLives(life);
 		}
 		
 		public function startMission():void {
-			view.itemIcon.visible = true;
-			view.questIcon.visible = false;
-			view.pocketWatch.minute_hand_target.visible = true;
-			view.pocketWatch.second_hand_target.visible = true;
-			view.pocketWatch.minute_hand_target.rotation = 111;
-			view.pocketWatch.second_hand_target.rotation = 21;
+			_view.showItemIcon();
+			_view.hideQuestIcon();
+			_view.showClockHands();
+			_view.setMinuteHandRotation(21);
+			_view.setSecondHandRotation(21);
 		}
 		
 		public function reset():void {
-			view.itemIcon.visible = false;
-			view.questIcon.visible = false;
-			view.pocketWatch.minute_hand_target.visible = false;
-			view.pocketWatch.second_hand_target.visible = false;
-			view.pocketWatch.minute_hand.rotation = 21
-			view.pocketWatch.second_hand.rotation = 21
+			_view.hideItemIcon();
+			_view.hideQuestIcon();
+			_view.hideClockHands();
+			_view.setMinuteHandRotation(21);
+			_view.setSecondHandRotation(21);
 		}
 		
 		public function showQuestIcon():void {
-			view.questIcon.visible = true;
+			_view.showQuestIcon();
 		}
 		
 		public function hideQuestIcon():void {
-			view.questIcon.visible = false;
+			_view.hideQuestIcon();
 		}
 		
 		public function isQuestIconVisible():Boolean {
-			return view.questIcon.visible;
+			return _view.questIconVisible;
 		}
 		
 		public function showInterface():void {
-			view.visible = true;
+			_view.show();
 		}
 		
 		public function hideInterface():void {
-			view.visible = false;
+			_view.hide();
 		}
 		
 		public function showItemIcon():void {
-			view.itemIcon.visible = true;
+			_view.showItemIcon();
 		}
 		
 		public function hideItemIcon():void {
-			view.itemIcon.visible = false;
+			_view.hideItemIcon();
 		}
 		
 		public function tickSecondHand():void {
-			view.pocketWatch.second_hand.rotation += 6;
+			_view.addSecondHandRotation(6);
 		}
 		
 		public function tickMinuteHand():void {
-			view.pocketWatch.minute_hand.rotation += 0.5;
+			_view.addMinuteHandRotation(0.5);
 		}
 		
-		public function get view():MovieClip {
-			return _view;
+		public function get graphics():MovieClip {
+			return _graphics;
 		}
 	}
 }
