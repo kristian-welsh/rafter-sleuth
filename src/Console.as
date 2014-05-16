@@ -3,12 +3,20 @@ package  {
 	import flash.text.*;
 
 	public class Console {
+		static public var INSTANCE:Console;
+		
 		var graphics:Sprite = new Sprite();
 		var text:TextField = new TextField();
 		
+		static public function createInstance(container:DisplayObjectContainer):void {
+			INSTANCE = new Console(container);
+		}
+		
+		// TODO: Align text to bottom of box.
 		public function Console(container:DisplayObjectContainer) {
 			drawWindow();
 			container.addChild(graphics);
+			hide();
 			text.autoSize = TextFieldAutoSize.LEFT;
 		}
 		
@@ -16,6 +24,14 @@ package  {
 			graphics.graphics.beginFill(0xAAAAAA);
 			graphics.graphics.drawRect(0, 0, 200, 500);
 			graphics.addChild(text);
+		}
+		
+		public function show():void {
+			graphics.visible = true;
+		}
+		
+		public function hide():void {
+			graphics.visible = false;
 		}
 		
 		public function log(message:Object):void {

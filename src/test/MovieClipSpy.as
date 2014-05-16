@@ -2,7 +2,12 @@ package test {
 	import flash.display.MovieClip;
 
 	public class MovieClipSpy extends MovieClip {
-		var _spy:Spy = new Spy();
+		private var _spy:Spy;
+		
+		public function MovieClipSpy() {
+			_spy = new Spy(this);
+			super();
+		}
 		
 		public function get spy():Spy {
 			return _spy;

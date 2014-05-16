@@ -4,6 +4,7 @@ package {
 	import flash.media.*;
 	import flash.utils.*;
 	import keyboard.*;
+	import ui.*;
 	
 	// BUG: if you use the map before the mission giver gets to the stand, the mission giver never shows up
 	// BUG: you need to click the screen again after using the map to be able to control your character again
@@ -43,16 +44,16 @@ package {
 			keys = new KeyboardControls(this);
 			player = new PlayerManager(playerView);
 			level = new LevelManager(levelView);
-			userInterfaceManager = new UserInterfaceManager(userInterfaceGraphics, new UserInterfaceView(userInterfaceGraphics));
+			userInterfaceManager = new UserInterfaceManager(new UserInterfaceView(userInterfaceGraphics));
 			super();
 		}
 		
 		public function startGame():void {
 			assert(stage != null, "Main needs to be added to the stage before calling startGame on it")
+			Console.createInstance(stage);
 			userInterfaceManager.displayLife(life);
 			userInterfaceManager.initialize();
 			addlisteners();
-			_console = new Console(stage);
 		}
 		
 		private function addlisteners():void {
@@ -479,9 +480,8 @@ package {
 			collectedItem = true;
 		}
 		
-		// BUG: values 21 and 111 and the greater than comparison are probably slightly off.
 		private function clock(event:TimerEvent):void {
-			if (userInterfaceManager.graphics.pocketWatch.second_hand.rotation > 21 && userInterfaceManager.graphics.pocketWatch.minute_hand.rotation > 111) {
+			if (userInterfaceManager.clockFinished()) {
 				if (textBox.currentTextPane < 14) {
 					textBox.show();
 					player.freeze();

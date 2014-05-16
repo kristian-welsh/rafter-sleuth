@@ -9,6 +9,7 @@ package test {
 		public function TestingHarness() {
 			super();
 			addChild(testRunner);
+			Console.createInstance(stage);
 			testRunner.start(AllTests, null, true);
 		}
 	}
