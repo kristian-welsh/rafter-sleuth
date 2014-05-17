@@ -21,6 +21,8 @@ package {
 		private var _canJump:Boolean;
 		private var _canAttack:Boolean;
 		private var _lastDir:String = "right";
+		private var _jumpSpeed:Number = 0;
+		private var _walkSpeed:Number = 15;
 		
 		public function get attacking():Boolean {
 			return _attacking;
@@ -72,6 +74,18 @@ package {
 		
 		public function get view():MovieClip {
 			return _view;
+		}
+		
+		public function get jumpSpeed():Number {
+			return _jumpSpeed;
+		}
+		
+		public function set jumpSpeed(value:Number):void {
+			_jumpSpeed = value;
+		}
+		
+		public function get walkSpeed():Number {
+			return _walkSpeed;
 		}
 		
 		public function setLastDireciton(value:String):void {

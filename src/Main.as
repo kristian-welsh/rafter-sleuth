@@ -11,7 +11,6 @@ package {
 	// BUG: if you use the map in mid-air you fall out of the level
 	public class Main extends Sprite implements KeyboardResponder {
 		static private const IMPULSE_SIZE:Number = 20;
-		static private const PLAYER_RADIUS:int = 45;
 		static private const ATTACK_RADIUS:int = 175;
 		
 		// cannot use stage.gotoAndPlay(1), so pass in a function from the timeline that does that
@@ -26,8 +25,6 @@ package {
 		
 		private var canAdvanceText:Boolean = true;
 		private var collectedItem:Boolean = false;
-		private var walkSpeed:Number = 15;
-		private var jumpSpeed:Number = 0;
 		private var gravity:Number = 1.5;
 		private var score:int = 0;
 		private var life:int = 6;
@@ -37,6 +34,7 @@ package {
 		private var questSound:Sound = new Bell_alert();
 		private var completeSound:Sound = new Mission_complete();
 		private var tocker:Timer = new Timer(1000);
+		private var collider:Collider;
 		
 		public function Main(userInterfaceGraphics:MovieClip, playerView:MovieClip, levelView:MovieClip, textDisplay:MovieClip, restartGameFunction:Function):void {
 			this.restartGameFunction = restartGameFunction;
@@ -45,6 +43,7 @@ package {
 			player = new PlayerManager(playerView);
 			level = new LevelManager(levelView);
 			userInterfaceManager = new UserInterfaceManager(new UserInterfaceView(userInterfaceGraphics));
+			collider = new Collider(player, level);
 			super();
 		}
 		
@@ -65,7 +64,7 @@ package {
 		public function jump():void {
 			if (player.shouldJump()) {
 				player.grounded = false;
-				jumpSpeed = 35;
+				player.jumpSpeed = 35;
 				if (tutorialProgress == 3) {
 					canAdvanceText = true;
 					checkForText();
@@ -76,7 +75,7 @@ package {
 		private function playerMove(event:Event):void {
 			moveLeftAndRight();
 			fall();
-			collideV();
+			collider.collideV()
 			collideStamps();
 			collideTea();
 			collideGhosts();
@@ -93,18 +92,18 @@ package {
 				return;
 			if (player.canMove) {
 				if (keys.leftKeyDown && !keys.rightKeyDown) {
-					if (!collideH()) {
+					if (!collider.collideH()) {
 						if (player.grounded)
 							player.displayWalkLeft();
-						level.view.x += walkSpeed;
+						level.view.x += player.walkSpeed;
 					}
 					player.setLastDireciton("left");
 				}
 				if (!keys.leftKeyDown && keys.rightKeyDown) {
-					if (!collideH()) {
+					if (!collider.collideH()) {
 						if (player.grounded)
 							player.displayWalkRight();
-						level.view.x -= walkSpeed;
+						level.view.x -= player.walkSpeed;
 					}
 					player.setLastDireciton("right");
 				}
@@ -126,66 +125,11 @@ package {
 			if (player.grounded)
 				return;
 			player.displayFalling();
-			if (jumpSpeed - gravity < -IMPULSE_SIZE) {
-				jumpSpeed = -IMPULSE_SIZE;
+			if (player.jumpSpeed - gravity < -IMPULSE_SIZE) {
+				player.jumpSpeed = -IMPULSE_SIZE;
 			}
-			jumpSpeed -= gravity;
-			level.view.y += jumpSpeed;
-		}
-		
-		/// Warning: both a command and a query
-		private function collideV():void {
-			for (var i:uint = 0; i < level.view.h_plats.numChildren; i++) {
-				if (player.view.x - PLAYER_RADIUS < level.view.h_plats.getChildAt(i).x + level.view.h_plats.x + level.view.x + 100) {
-					if (player.view.x + PLAYER_RADIUS > level.view.h_plats.getChildAt(i).x + level.view.h_plats.x + level.view.x) {
-						if (player.view.y < level.view.h_plats.getChildAt(i).y + level.view.h_plats.y + level.view.y) {
-							if (player.view.y - jumpSpeed > level.view.h_plats.getChildAt(i).y + level.view.h_plats.y + level.view.y) {
-								level.view.y = player.view.y - level.view.h_plats.y - level.view.h_plats.getChildAt(i).y + 1;
-								player.grounded = true;
-								break;
-							}
-						}
-					}
-				}
-			}
-			if (i == level.view.h_plats.numChildren) {
-				player.fall();
-			}
-		}
-		
-		/// Warning: both a command and a query
-		private function collideH():Boolean {
-			var returnValue:Boolean;
-			for (var i:uint = 0; i < level.view.edge_plats.numChildren; i++) {
-				if (player.view.y > level.view.edge_plats.getChildAt(i).y + level.view.edge_plats.y + level.view.y) {
-					if (player.view.y - player.view.height < level.view.edge_plats.getChildAt(i).y + level.view.edge_plats.y + level.view.y + 100) {
-						if (player.isFacingLeft()) {
-							if (player.view.x - PLAYER_RADIUS > level.view.edge_plats.getChildAt(i).x + level.view.edge_plats.x + level.view.x + 100) {
-								if (player.view.x - PLAYER_RADIUS - walkSpeed < level.view.edge_plats.getChildAt(i).x + level.view.edge_plats.x + level.view.x + 100) {
-									player.view.x = level.view.edge_plats.getChildAt(i).x + level.view.edge_plats.x + level.view.x + 100 + PLAYER_RADIUS + 1;
-									returnValue = true;
-									player.displayIdleLeft();
-									break;
-								}
-							}
-						}
-						if (player.isFacingRight()) {
-							if (player.view.x + PLAYER_RADIUS < level.view.edge_plats.getChildAt(i).x + level.view.edge_plats.x + level.view.x) {
-								if (player.view.x + PLAYER_RADIUS + walkSpeed > level.view.edge_plats.getChildAt(i).x + level.view.edge_plats.x + level.view.x) {
-									player.view.x = level.view.edge_plats.getChildAt(i).x + level.view.edge_plats.x + level.view.x - PLAYER_RADIUS - 1;
-									returnValue = true;
-									player.displayIdleRight();
-									break;
-								}
-							}
-						}
-					}
-				}
-			}
-			if (i == level.view.edge_plats.numChildren) {
-				returnValue = false;
-			}
-			return returnValue
+			player.jumpSpeed -= gravity;
+			level.view.y += player.jumpSpeed;
 		}
 		
 		private function collideStamps():void {
