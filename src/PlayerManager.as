@@ -23,6 +23,7 @@ package {
 		private var _lastDir:String = "right";
 		private var _jumpSpeed:Number = 0;
 		private var _walkSpeed:Number = 15;
+		private var _gravity:Number = 1.5;
 		
 		public function get attacking():Boolean {
 			return _attacking;
@@ -86,6 +87,10 @@ package {
 		
 		public function get walkSpeed():Number {
 			return _walkSpeed;
+		}
+		
+		public function get gravity():Number {
+			return _gravity;
 		}
 		
 		public function setLastDireciton(value:String):void {

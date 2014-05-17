@@ -22,16 +22,13 @@ package {
 		private var level:LevelManager;
 		private var userInterface:UserInterfaceManager;
 		private var collider:Collider;
+		private var soundManager:SoundManager;
 		
 		private var canAdvanceText:Boolean = true;
 		private var collectedItem:Boolean = false;
-		private var gravity:Number = 1.5;
 		private var life:int = 6;
-		private var currentMission:int = 0
+		private var currentMission:int = 0;
 		private var tutorialProgress:int = 1;
-		private var missionSoundsChannel:SoundChannel = new SoundChannel();
-		private var questSound:Sound = new Bell_alert();
-		private var completeSound:Sound = new Mission_complete();
 		private var tocker:Timer = new Timer(1000);
 		
 		public function Main(userInterfaceGraphics:MovieClip, playerView:MovieClip, levelView:MovieClip, textDisplay:MovieClip, restartGameFunction:Function):void {
@@ -42,6 +39,7 @@ package {
 			level = new LevelManager(levelView);
 			userInterface = new UserInterfaceManager(new UserInterfaceView(userInterfaceGraphics));
 			collider = new Collider(player, level);
+			soundManager = new SoundManager();
 			super();
 		}
 		
@@ -60,13 +58,13 @@ package {
 		}
 		
 		public function jump():void {
-			if (player.shouldJump()) {
-				player.grounded = false;
-				player.jumpSpeed = 35;
-				if (tutorialProgress == 3) {
-					canAdvanceText = true;
-					checkForText();
-				}
+			if (!player.shouldJump())
+				return;
+			player.grounded = false;
+			player.jumpSpeed = 35;
+			if (tutorialProgress == 3) {
+				canAdvanceText = true;
+				checkForText();
 			}
 		}
 		
@@ -123,10 +121,10 @@ package {
 			if (player.grounded)
 				return;
 			player.displayFalling();
-			if (player.jumpSpeed - gravity < -IMPULSE_SIZE) {
+			if (player.jumpSpeed - player.gravity < -IMPULSE_SIZE) {
 				player.jumpSpeed = -IMPULSE_SIZE;
 			}
-			player.jumpSpeed -= gravity;
+			player.jumpSpeed -= player.gravity;
 			level.view.y += player.jumpSpeed;
 		}
 		
@@ -336,7 +334,7 @@ package {
 		
 		private function questAlert():void {
 			userInterface.showQuestIcon();
-			missionSoundsChannel = questSound.play();
+			soundManager.playQuestSound();
 		}
 		
 		private function checkMissionDialougeCollision():void {
@@ -359,7 +357,7 @@ package {
 					if (textBox.currentTextPane == 13) {
 						switchToText()
 						if (level.view.missionRunners.currentFrame != 105) {
-							missionSoundsChannel = completeSound.play();
+							soundManager.playCompleteSound();
 						}
 						level.view.missionRunners.gotoAndStop(105)
 					}
@@ -380,11 +378,21 @@ package {
 				player.view.visible = false;
 				userInterface.hideInterface();
 				level.displayMap();
-				level.view.map1.train_station_btn.addEventListener(MouseEvent.CLICK, function(e:Event) { goToLevel(1); } );
-				level.view.map1.north_wing_btn.addEventListener(MouseEvent.CLICK, function(e:Event) { goToLevel(2); } );
-				level.view.map1.east_wing_btn.addEventListener(MouseEvent.CLICK, function(e:Event) { goToLevel(3); } );
-				level.view.map1.south_wing_btn.addEventListener(MouseEvent.CLICK, function(e:Event) { goToLevel(4); } );
-				level.view.map1.west_wing_btn.addEventListener(MouseEvent.CLICK, function(e:Event) { goToLevel(5); } );
+				level.view.map1.train_station_btn.addEventListener(MouseEvent.CLICK, function(e:Event) {
+						goToLevel(1);
+					});
+				level.view.map1.north_wing_btn.addEventListener(MouseEvent.CLICK, function(e:Event) {
+						goToLevel(2);
+					});
+				level.view.map1.east_wing_btn.addEventListener(MouseEvent.CLICK, function(e:Event) {
+						goToLevel(3);
+					});
+				level.view.map1.south_wing_btn.addEventListener(MouseEvent.CLICK, function(e:Event) {
+						goToLevel(4);
+					});
+				level.view.map1.west_wing_btn.addEventListener(MouseEvent.CLICK, function(e:Event) {
+						goToLevel(5);
+					});
 			} else {
 				goToLevel(level.currentLevel)
 			}
