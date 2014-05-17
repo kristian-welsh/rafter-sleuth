@@ -19,6 +19,7 @@ package test {
 			test("tickSecondHand");
 			test("tickMinuteHand");
 			test("clockFinished");
+			test("increaseScore");
 		}
 	}
 }

@@ -3,6 +3,7 @@ package ui {
 
 	public class UserInterfaceManager {
 		private var _view:UIView;
+		private var score:uint;
 		
 		public function UserInterfaceManager(view:UIView) {
 			_view = view;
@@ -13,14 +14,6 @@ package ui {
 			_view.hideQuestIcon();
 			_view.setMinuteHandRotation(21);
 			_view.setSecondHandRotation(21);
-		}
-		
-		public function displayScore(score:int):void {
-			_view.setScore(score);
-		}
-		
-		public function displayLife(life:int):void {
-			_view.setLives(life);
 		}
 		
 		public function startMission():void {
@@ -37,6 +30,25 @@ package ui {
 			_view.hideClockHands();
 			_view.setMinuteHandRotation(21);
 			_view.setSecondHandRotation(21);
+			resetScore();
+		}
+		
+		public function displayScore(score:int):void {
+			_view.setScore(score);
+		}
+		
+		private function resetScore():void {
+			score = 0;
+			displayScore(score);
+		}
+		
+		public function increaseScore():void {
+			score++;
+			displayScore(score);
+		}
+		
+		public function displayLife(life:int):void {
+			_view.setLives(life);
 		}
 		
 		public function showQuestIcon():void {

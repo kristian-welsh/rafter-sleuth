@@ -48,6 +48,7 @@ package ui {
 			view.spy.assertCalled(view.hideClockHands);
 			view.spy.assertCalledWithArguments(view.setMinuteHandRotation, [21]);
 			view.spy.assertCalledWithArguments(view.setSecondHandRotation, [21]);
+			view.spy.assertCalledWithArguments(view.setScore, [0]);
 		}
 		
 		public function showQuestIcon():void {
@@ -100,6 +101,11 @@ package ui {
 			assertClockFinishedFalse(1000, 0);
 			assertClockFinishedFalse(111, 1000);
 			assertClockFinishedFalse(0, 1000);
+		}
+		
+		public function increaseScore():void {
+			userInterface.increaseScore();
+			view.spy.assertCalledWithArguments(view.setScore, [1]);
 		}
 		
 		private function assertClockFinishedTrue(minutes:Number, seconds:Number):void {
