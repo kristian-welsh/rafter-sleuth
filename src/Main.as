@@ -23,30 +23,29 @@ package {
 		private var userInterface:UserInterfaceManager;
 		private var collider:Collider;
 		private var soundManager:SoundManager;
+		private var clockManager:ClockManager
 		
 		private var canAdvanceText:Boolean = true;
 		private var collectedItem:Boolean = false;
-		private var life:int = 6;
 		private var currentMission:int = 0;
 		private var tutorialProgress:int = 1;
-		private var tocker:Timer = new Timer(1000);
 		
 		public function Main(userInterfaceGraphics:MovieClip, playerView:MovieClip, levelView:MovieClip, textDisplay:MovieClip, restartGameFunction:Function):void {
 			this.restartGameFunction = restartGameFunction;
 			textBox = new TextBox(textDisplay);
 			keys = new KeyboardControls(this);
+			soundManager = new SoundManager();
+			userInterface = new UserInterfaceManager(new UserInterfaceView(userInterfaceGraphics));
 			player = new PlayerManager(playerView);
 			level = new LevelManager(levelView);
-			userInterface = new UserInterfaceManager(new UserInterfaceView(userInterfaceGraphics));
 			collider = new Collider(player, level);
-			soundManager = new SoundManager();
+			clockManager = new ClockManager(userInterface, textBox, player);
 			super();
 		}
 		
 		public function startGame():void {
 			assert(stage != null, "Main needs to be added to the stage before calling startGame on it")
 			Console.createInstance(stage);
-			userInterface.displayLife(life);
 			userInterface.initialize();
 			addlisteners();
 		}
@@ -54,14 +53,12 @@ package {
 		private function addlisteners():void {
 			keys.startListening(stage);
 			player.view.addEventListener(Event.ENTER_FRAME, playerMove);
-			tocker.addEventListener(TimerEvent.TIMER, clock);
 		}
 		
 		public function jump():void {
 			if (!player.shouldJump())
 				return;
-			player.grounded = false;
-			player.jumpSpeed = 35;
+			player.jump();
 			if (tutorialProgress == 3) {
 				canAdvanceText = true;
 				checkForText();
@@ -79,7 +76,7 @@ package {
 			checkMissionDialougeCollision();
 			collideMissionObjects();
 			if (currentMission == 1) {
-				tocker.start();
+				clockManager.start();
 			}
 		}
 		
@@ -143,8 +140,7 @@ package {
 			var teaCup:MovieClip = level.view.teaCup;
 			if (player.view.hitBox.hitTestObject(teaCup)) {
 				Util.orphanDisplayObject(teaCup);
-				life++
-				userInterface.displayLife(life);
+				userInterface.increaseLives();
 			}
 		}
 		
@@ -162,9 +158,8 @@ package {
 		}
 		
 		private function hurtPlayer():void {
-			life--;
-			userInterface.displayLife(life);
-			if (life == 0) {
+			userInterface.decreaseLives();
+			if (userInterface.life == 0) {
 				killPlayer();
 			} else {
 				player.invincible = true;
@@ -181,7 +176,7 @@ package {
 		}
 		
 		public function attack():void {
-			if (!player.attacking && player.grounded && keys.canAttack && player.canAttack) {
+			if (player.grounded && !player.attacking && player.canAttack && keys.canAttack) {
 				keys.canAttack = false;
 				player.attacking = true;
 				var ghost:MovieClip;
@@ -313,11 +308,8 @@ package {
 			textBox.displayTextPane(12);
 			textBox.hide()
 			level.reset();
-			life = 6
-			userInterface.displayLife(life);
 			userInterface.reset();
-			tocker.stop();
-			tocker.removeEventListener(TimerEvent.TIMER, clock);
+			clockManager.stop();
 			player.reset();
 			player.view.removeEventListener(Event.ENTER_FRAME, playerMove);
 		}
@@ -428,19 +420,7 @@ package {
 		}
 		
 		private function clock(event:TimerEvent):void {
-			if (userInterface.clockFinished()) {
-				if (textBox.currentTextPane < 14) {
-					textBox.show();
-					player.freeze();
-					textBox.displayTextPane(15);
-					userInterface.hideItemIcon();
-					userInterface.hideQuestIcon();
-				}
-			}
-			if (textBox.visible == false) {
-				userInterface.tickSecondHand();
-				userInterface.tickMinuteHand();
-			}
+			clockManager.clock(event);
 		}
 	}
 }

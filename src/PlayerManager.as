@@ -117,6 +117,11 @@ package {
 			return grounded && (!attacking) && canJump;
 		}
 		
+		public function jump():void {
+			grounded = false;
+			jumpSpeed = 35;
+		}
+		
 		public function checkAttackStatus():void {
 			if (!attacking)
 				return;

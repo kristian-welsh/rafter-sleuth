@@ -36,13 +36,23 @@ package test {
 		 * Asserts that the funciton has been logged with the expected arguments.
 		 */
 		public function assertCalledWithArguments(expectedFunction:Function, expectedArguments:Array):void {
-			var functionLogIndex:int = functionLog.indexOf(expectedFunction);
-			if (functionLogIndex == -1) {
-				failNotCalled(expectedFunction);
-			} else {
-				for each(var arg:Object in expectedArguments)
-					assertEquals(arg, argumentLog[functionLogIndex]);
+			assertCalled(expectedFunction);
+			for (var functionIndex:uint = 0; functionIndex < functionLog.length; ++functionIndex) {
+				if (expectedFunction == functionLog[functionIndex]) {
+					if (argsMatch(argumentLog[functionIndex], expectedArguments))
+						return;
+				}
 			}
+			fail("function matched, but with incorrect arguments");
+		}
+		
+		private function argsMatch(loggedArguments:Array, expectedArguments:Array):Boolean {
+			for (var argumentIndex:uint = 0; argumentIndex < loggedArguments.length; ++argumentIndex) {
+				if (expectedArguments[argumentIndex] == loggedArguments[argumentIndex]) {
+					return true;
+				}
+			}
+			return false;
 		}
 		
 		/**

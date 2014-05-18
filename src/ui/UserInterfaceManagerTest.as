@@ -20,16 +20,7 @@ package ui {
 			view.spy.assertCalled(view.hideQuestIcon);
 			view.spy.assertCalledWithArguments(view.setMinuteHandRotation, [21]);
 			view.spy.assertCalledWithArguments(view.setSecondHandRotation, [21]);
-		}
-		
-		public function displayScore():void {
-			userInterface.displayScore(50);
-			view.spy.assertCalledWithArguments(view.setScore, [50]);
-		}
-		
-		public function displayLife():void {
-			userInterface.displayLife(50);
-			view.spy.assertCalledWithArguments(view.setLives, [50]);
+			view.spy.assertCalledWithArguments(view.setLives, [6]);
 		}
 		
 		public function startMission():void {
@@ -49,6 +40,7 @@ package ui {
 			view.spy.assertCalledWithArguments(view.setMinuteHandRotation, [21]);
 			view.spy.assertCalledWithArguments(view.setSecondHandRotation, [21]);
 			view.spy.assertCalledWithArguments(view.setScore, [0]);
+			view.spy.assertCalledWithArguments(view.setLives, [6]);
 		}
 		
 		public function showQuestIcon():void {
@@ -106,6 +98,11 @@ package ui {
 		public function increaseScore():void {
 			userInterface.increaseScore();
 			view.spy.assertCalledWithArguments(view.setScore, [1]);
+		}
+		
+		public function increaseLives():void {
+			userInterface.increaseLives();
+			view.spy.assertCalledWithArguments(view.setLives, [7]);
 		}
 		
 		private function assertClockFinishedTrue(minutes:Number, seconds:Number):void {

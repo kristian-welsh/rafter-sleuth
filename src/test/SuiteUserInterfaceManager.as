@@ -5,8 +5,6 @@ package test {
 		public function SuiteUserInterfaceManager() {
 			super(UserInterfaceManagerTest);
 			test("initialize");
-			test("displayScore");
-			test("displayLife");
 			test("startMission");
 			test("reset");
 			test("showQuestIcon");
@@ -20,6 +18,7 @@ package test {
 			test("tickMinuteHand");
 			test("clockFinished");
 			test("increaseScore");
+			test("increaseLives");
 		}
 	}
 }

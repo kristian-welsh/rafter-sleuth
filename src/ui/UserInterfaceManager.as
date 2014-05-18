@@ -4,6 +4,7 @@ package ui {
 	public class UserInterfaceManager {
 		private var _view:UIView;
 		private var score:uint;
+		private var _lives:uint = 6;
 		
 		public function UserInterfaceManager(view:UIView) {
 			_view = view;
@@ -14,6 +15,8 @@ package ui {
 			_view.hideQuestIcon();
 			_view.setMinuteHandRotation(21);
 			_view.setSecondHandRotation(21);
+			_lives = 6
+			displayLife();
 		}
 		
 		public function startMission():void {
@@ -30,25 +33,41 @@ package ui {
 			_view.hideClockHands();
 			_view.setMinuteHandRotation(21);
 			_view.setSecondHandRotation(21);
+			_lives = 6
+			displayLife();
 			resetScore();
 		}
 		
-		public function displayScore(score:int):void {
+		private function displayScore():void {
 			_view.setScore(score);
 		}
 		
 		private function resetScore():void {
 			score = 0;
-			displayScore(score);
+			displayScore();
 		}
 		
 		public function increaseScore():void {
 			score++;
-			displayScore(score);
+			displayScore();
 		}
 		
-		public function displayLife(life:int):void {
-			_view.setLives(life);
+		public function get life():uint {
+			return _lives;
+		}
+		
+		public function increaseLives():void {
+			_lives++;
+			displayLife();
+		}
+		
+		public function decreaseLives():void {
+			_lives--;
+			displayLife();
+		}
+		
+		private function displayLife():void {
+			_view.setLives(_lives);
 		}
 		
 		public function showQuestIcon():void {
