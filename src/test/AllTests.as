@@ -8,6 +8,7 @@ package test {
 			addTest(new SuiteKeyboardControls());
 			addTest(new SuiteTextBox());
 			addTest(new SuiteUserInterfaceManager());
+			addTest(new MissionManagerTest("testPane1"));
 		}
 	}
 }

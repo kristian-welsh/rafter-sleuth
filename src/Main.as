@@ -24,11 +24,9 @@ package {
 		private var collider:Collider;
 		private var soundManager:SoundManager;
 		private var clockManager:ClockManager
+		private var missionManager:MissionManager;
 		
-		private var canAdvanceText:Boolean = true;
 		private var collectedItem:Boolean = false;
-		private var currentMission:int = 0;
-		private var tutorialProgress:int = 1;
 		
 		public function Main(userInterfaceGraphics:MovieClip, playerView:MovieClip, levelView:MovieClip, textDisplay:MovieClip, restartGameFunction:Function):void {
 			this.restartGameFunction = restartGameFunction;
@@ -40,6 +38,7 @@ package {
 			level = new LevelManager(levelView);
 			collider = new Collider(player, level);
 			clockManager = new ClockManager(userInterface, textBox, player);
+			missionManager = new MissionManager(textBox, player, level, userInterface, gameWin);
 			super();
 		}
 		
@@ -59,23 +58,25 @@ package {
 			if (!player.shouldJump())
 				return;
 			player.jump();
-			if (tutorialProgress == 3) {
-				canAdvanceText = true;
+			if (missionManager.tutorialProgress == 3) {
+				missionManager.canAdvanceText = true;
 				checkForText();
 			}
 		}
 		
 		private function playerMove(event:Event):void {
+			player.updateInvincibility();
 			moveLeftAndRight();
 			fall();
 			collider.collideV()
 			collideStamps();
 			collideTea();
-			collideGhosts();
+			if (!player.invincible)
+				collideGhosts();
 			player.checkAttackStatus();
 			checkMissionDialougeCollision();
 			collideMissionObjects();
-			if (currentMission == 1) {
+			if (missionManager.currentMission == 1) {
 				clockManager.start();
 			}
 		}
@@ -100,9 +101,11 @@ package {
 					}
 					player.setLastDireciton("right");
 				}
-				if ((keys.leftKeyDown || keys.rightKeyDown) && tutorialProgress == 2) {
-					canAdvanceText = true;
-					checkForText();
+				if (keys.leftKeyDown || keys.rightKeyDown) {
+					if (missionManager.tutorialProgress == 2) {
+						missionManager.canAdvanceText = true;
+						checkForText();
+					}
 				}
 			}
 			if (playerShouldBeIdle()) {
@@ -114,6 +117,7 @@ package {
 			return ((!keys.leftKeyDown && !keys.rightKeyDown) || (keys.leftKeyDown && keys.rightKeyDown)) && player.grounded
 		}
 		
+		// TODO: move to player
 		private function fall():void {
 			if (player.grounded)
 				return;
@@ -136,6 +140,7 @@ package {
 			}
 		}
 		
+		// TODO: standardize the tea in the fla to be the same as the stamps and ghosts to increase duplication.
 		private function collideTea():void {
 			var teaCup:MovieClip = level.view.teaCup;
 			if (player.view.hitBox.hitTestObject(teaCup)) {
@@ -145,14 +150,11 @@ package {
 		}
 		
 		private function collideGhosts():void {
-			player.updateInvincibility();
-			if (!player.invincible) {
-				var ghost:MovieClip;
-				for (var i:uint = 0; i < level.view.ghosts.numChildren; i++) {
-					ghost = level.view.ghosts.getChildAt(i) as MovieClip;
-					if (player.view.hitBox.hitTestObject(ghost)) {
-						hurtPlayer();
-					}
+			var ghost:MovieClip;
+			for (var i:uint = 0; i < level.view.ghosts.numChildren; i++) {
+				ghost = level.view.ghosts.getChildAt(i) as MovieClip;
+				if (player.view.hitBox.hitTestObject(ghost)) {
+					hurtPlayer();
 				}
 			}
 		}
@@ -186,142 +188,32 @@ package {
 						Util.orphanDisplayObject(ghost);
 					}
 				}
-				if (tutorialProgress == 4) {
-					canAdvanceText = true;
+				if (missionManager.tutorialProgress == 4) {
+					missionManager.canAdvanceText = true;
 					checkForText();
 				}
 			}
 		}
 		
 		public function checkForText():void {
-			if (!textBox.visible)
-				return;
-			switch (textBox.currentTextPane) {
-				case 1:
-					textBox.displayTextPane(2);
-					tutorialProgress = 2;
-					player.canMove = true;
-					canAdvanceText = false;
-					break;
-				case 2:
-					if (canAdvanceText) {
-						textBox.displayTextPane(3);
-						tutorialProgress = 3;
-						canAdvanceText = false;
-						player.canJump = true;
-						player.canMove = false;
-					}
-					break;
-				case 3:
-					if (canAdvanceText) {
-						textBox.displayTextPane(4);
-						tutorialProgress = 4;
-						canAdvanceText = false;
-						player.canJump = false;
-						player.canAttack = true;
-					}
-					break;
-				case 4:
-					if (canAdvanceText) {
-						textBox.displayTextPane(5);
-						tutorialProgress = 5;
-						player.canAttack = false;
-					}
-					break;
-				case 5:
-					textBox.displayTextPane(6);
-					tutorialProgress = 6;
-					break;
-				case 6:
-					textBox.displayTextPane(7);
-					tutorialProgress = 7;
-					break;
-				case 7:
-					textBox.displayTextPane(8);
-					tutorialProgress = 8;
-					break;
-				case 8:
-					textBox.displayTextPane(9);
-					tutorialProgress = 9;
-					break;
-				case 9:
-					textBox.displayTextPane(10);
-					tutorialProgress = 10;
-					break;
-				case 10:
-					textBox.displayTextPane(11);
-					tutorialProgress = 11;
-					break;
-				case 11:
-					textBox.displayTextPane(12)
-					textBox.hide();
-					player.canJump = true;
-					player.canAttack = true;
-					player.canMove = true;
-					tutorialProgress = 13;
-					level.view.officer.gotoAndPlay(7);
-					level.view.missionRunners.play();
-					break;
-				case 12:
-					textBox.hide();
-					player.canMove = true;
-					player.canJump = true;
-					player.canAttack = true;
-					textBox.displayTextPane(13);
-					userInterface.startMission();
-					currentMission = 1
-					break;
-				case 13:
-					level.view.missionRunners.play();
-					textBox.displayTextPane(14);
-					textBox.box.PlayAgain.addEventListener(MouseEvent.CLICK, gameWin);
-					break;
-				case 14:
-					textBox.hide()
-					player.canMove = true;
-					player.canJump = true;
-					player.canAttack = true;
-					break;
-				case 15:
-					// end game
-					break;
-				case 16:
-					textBox.displayTextPane(17);
-					break;
-				case 17:
-					// end game
-					break;
-			}
+			missionManager.checkForText();
 		}
 		
-		private function gameWin(MouseEvent):void {
+		public function gameWin(MouseEvent):void {
 			resetGame();
 			restartGameFunction();
 		}
 		
 		private function resetGame():void {
-			for (var j:int = 5; j > 0; j--) {
-				resetLevel(j)
-			}
+			level.resetLevels();
+			missionManager.currentMission = 0
 			collectedItem = false
-			currentMission = 0
 			textBox.displayTextPane(12);
 			textBox.hide()
-			level.reset();
 			userInterface.reset();
 			clockManager.stop();
 			player.reset();
 			player.view.removeEventListener(Event.ENTER_FRAME, playerMove);
-		}
-		
-		private function resetLevel(levelNumber:int):void {
-			level.enterLevel(levelNumber);
-			if (levelNumber != 1) {
-				level.resetMissionObjects();
-			}
-			level.resetStamps();
-			level.resetGhosts();
-			level.currentLevel = levelNumber;
 		}
 		
 		private function questAlert():void {
@@ -332,18 +224,18 @@ package {
 		private function checkMissionDialougeCollision():void {
 			if (level.currentLevel != 1)
 				return;
-			if (level.view.missionRunners.currentFrame == currentMission * 180 + 102) {
+			if (level.view.missionRunners.currentFrame == missionManager.currentMission * 180 + 102) {
 				if (!userInterface.isQuestIconVisible()) {
 					questAlert()
 				}
 			}
 			if (player.view.hitBox.hitTestObject(level.view.lostAndFound.hitBox)) {
 				if (!collectedItem) {
-					if (level.view.missionRunners.currentFrame == currentMission * 180 + 102) {
+					if (level.view.missionRunners.currentFrame == missionManager.currentMission * 180 + 102) {
+						switchToText()
 						if (!userInterface.isQuestIconVisible()) {
 							questAlert()
 						}
-						switchToText()
 					}
 				} else {
 					if (textBox.currentTextPane == 13) {
@@ -361,7 +253,7 @@ package {
 			player.displayIdle();
 			textBox.show();
 			player.freeze();
-			canAdvanceText = true;
+			missionManager.canAdvanceText = true;
 		}
 		
 		public function viewMap():void {
@@ -394,10 +286,10 @@ package {
 			player.view.addEventListener(Event.ENTER_FRAME, playerMove);
 			level.goToLevel(levelNumber);
 			if (level.currentLevel == 1) {
-				if (tutorialProgress == 13) {
+				if (missionManager.tutorialProgress == 13) {
 					level.view.officer.gotoAndStop(31);
 				}
-				if (currentMission == 1) {
+				if (missionManager.currentMission == 1) {
 					level.view.missionRunners.gotoAndStop(104);
 				}
 			}

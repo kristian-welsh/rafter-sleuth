@@ -19,16 +19,29 @@ package {
 			_view = view;
 		}
 		
-		public function reset():void {
+		public function enterLevel(levelNumber:int):void {
+			view.gotoAndStop(levelNumber);
+			view.teaCup.visible = false;
+		}
+		
+		public function resetLevels():void {
 			_view.x = 319.6
 			_view.y = -1355
 			_view.officer.gotoAndPlay(7);
 			_view.missionRunners.gotoAndPlay(2);
+			for (var j:int = 5; j > 0; j--) {
+				resetLevel(j)
+			}
 		}
 		
-		public function enterLevel(levelNumber:int):void {
-			view.gotoAndStop(levelNumber);
-			view.teaCup.visible = false;
+		public function resetLevel(levelNumber:Number):void {
+			enterLevel(levelNumber);
+			if (levelNumber != 1) {
+				resetMissionObjects();
+			}
+			resetStamps();
+			resetGhosts();
+			currentLevel = levelNumber;
 		}
 		
 		public function resetMissionObjects():void {
