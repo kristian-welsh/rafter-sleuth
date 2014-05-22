@@ -8,6 +8,7 @@ package {
 	public class MissionManagerTest extends TestCase {
 		private var textBox:TextBox;
 		private var missionManager:MissionManager;
+		private var player:PlayerDataSpy;
 		
 		public function MissionManagerTest(testMethod:String):void {
 			super(testMethod);
@@ -15,7 +16,7 @@ package {
 		
 		protected override function setUp():void {
 			textBox = new TextBox(new MovieClip());
-			var player:PlayerManager = new PlayerManager(new MovieClip());
+			player = new PlayerDataSpy();
 			var level:LevelManager = new LevelManager(new MovieClip());
 			var userInterface:UserInterfaceManager = new UserInterfaceManager(new UserInterfaceView(new MovieClip()));
 			var gameWin:Function = function(e:Event):void {
@@ -27,54 +28,56 @@ package {
 		public function testPane1():void {
 			textBox.displayTextPane(1);
 			missionManager.checkForText();
+			
+			assertEquals(2, textBox.currentTextPane);
+			assertEquals(2, missionManager.tutorialProgress);
+			assertFalse(missionManager.canAdvanceText);
+			player.getSpy().assertCalledWithArguments(player.setCanMove, [true]);
 		}
-		
-		// not used yet
 		
 		public function testPane2():void {
 			textBox.displayTextPane(2);
 			missionManager.checkForText();
+			
+			assertEquals(3, textBox.currentTextPane);
+			assertEquals(3, missionManager.tutorialProgress);
+			assertFalse(missionManager.canAdvanceText);
+			
+			player.getSpy().assertCalledWithArguments(player.setCanJump, [true]);
+			player.getSpy().assertCalledWithArguments(player.setCanMove, [false]);
 		}
 		
 		public function testPane3():void {
 			textBox.displayTextPane(3);
 			missionManager.checkForText();
+			
+			assertEquals(4, textBox.currentTextPane);
+			assertEquals(4, missionManager.tutorialProgress);
+			assertFalse(missionManager.canAdvanceText);
+			
+			player.getSpy().assertCalledWithArguments(player.setCanJump, [false]);
+			player.getSpy().assertCalledWithArguments(player.setCanAttack, [true]);
 		}
 		
 		public function testPane4():void {
 			textBox.displayTextPane(4);
 			missionManager.checkForText();
+			
+			assertEquals(5, textBox.currentTextPane);
+			assertEquals(5, missionManager.tutorialProgress);
+			
+			player.getSpy().assertCalledWithArguments(player.setCanAttack, [false]);
 		}
 		
-		public function testPane5():void {
-			textBox.displayTextPane(5);
-			missionManager.checkForText();
-		}
-		
-		public function testPane6():void {
-			textBox.displayTextPane(6);
-			missionManager.checkForText();
-		}
-		
-		public function testPane7():void {
-			textBox.displayTextPane(7);
-			missionManager.checkForText();
-		}
-		
-		public function testPane8():void {
-			textBox.displayTextPane(8);
-			missionManager.checkForText();
-		}
-		
-		public function testPane9():void {
-			textBox.displayTextPane(9);
-			missionManager.checkForText();
-		}
-		
-		public function testPane10():void {
+		public function testNormalPane():void {
 			textBox.displayTextPane(10);
 			missionManager.checkForText();
+			
+			assertEquals(11, textBox.currentTextPane);
+			assertEquals(11, missionManager.tutorialProgress);
 		}
+		
+		// not used as of yet.
 		
 		public function testPane11():void {
 			textBox.displayTextPane(11);

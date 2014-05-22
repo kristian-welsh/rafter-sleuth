@@ -3,12 +3,14 @@ package  {
 
 	public class TextBox {
 		private var view:MovieClip;
+		private var textPaneNumber:uint;
 		
 		public function TextBox(view:MovieClip) {
 			this.view = view;
 		}
 		
 		public function displayTextPane(textPaneNumber:uint):void {
+			this.textPaneNumber = textPaneNumber;
 			view.gotoAndStop(textPaneNumber);
 		}
 		
@@ -25,7 +27,7 @@ package  {
 		}
 		
 		public function get currentTextPane():int {
-			return view.currentFrame;
+			return textPaneNumber;
 		}
 		
 		public function get box():MovieClip {

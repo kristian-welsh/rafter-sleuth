@@ -4,17 +4,22 @@ package {
 	
 	public class MissionManager {
 		private var textBox:TextBox;
-		private var player:PlayerManager;
+		private var player:PlayerData;
 		private var level:LevelManager;
 		private var userInterface:UserInterfaceManager;
 		private var winGame:Function;
 		
 		private var _canAdvanceText:Boolean = true;
 		private var _currentMission:int = 0;
-		private var _tutorialProgress:int = 1;
+		private var _tutorialProgress:int = 1; // is never 12 for some reason
 		
 		public function set canAdvanceText(value:Boolean):void {
 			_canAdvanceText = value;
+		}
+		
+		// added for tests, not used in system
+		public function get canAdvanceText():Boolean {
+			return _canAdvanceText;
 		}
 		
 		public function get currentMission():int {
@@ -29,7 +34,7 @@ package {
 			return _tutorialProgress;
 		}
 		
-		public function MissionManager(textBox:TextBox, player:PlayerManager, level:LevelManager, userInterface:UserInterfaceManager, winGame:Function) {
+		public function MissionManager(textBox:TextBox, player:PlayerData, level:LevelManager, userInterface:UserInterfaceManager, winGame:Function) {
 			this.level = level;
 			this.player = player;
 			this.textBox = textBox;
@@ -63,22 +68,22 @@ package {
 					break;
 				case 11:
 					textBox.displayTextPane(12)
+					_tutorialProgress = 13;
 					textBox.hide();
 					player.canJump = true;
 					player.canAttack = true;
 					player.canMove = true;
-					_tutorialProgress = 13;
-					level.view.officer.gotoAndPlay(7);
+					level.view.officer.gotoAndPlay(7); // extract funciton on level
 					level.view.missionRunners.play();
 					break;
 				case 12:
+					textBox.displayTextPane(13);
+					_currentMission = 1
 					textBox.hide();
 					player.canMove = true;
 					player.canJump = true;
 					player.canAttack = true;
-					textBox.displayTextPane(13);
 					userInterface.startMission();
-					_currentMission = 1
 					break;
 				case 13:
 					level.view.missionRunners.play();
@@ -106,8 +111,8 @@ package {
 		private function pane1():void {
 			textBox.displayTextPane(2);
 			_tutorialProgress = 2;
-			player.canMove = true;
 			_canAdvanceText = false;
+			player.canMove = true;
 		}
 		
 		private function pane2():void {

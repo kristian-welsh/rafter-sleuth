@@ -9,6 +9,11 @@ package test {
 			addTest(new SuiteTextBox());
 			addTest(new SuiteUserInterfaceManager());
 			addTest(new MissionManagerTest("testPane1"));
+			addTest(new MissionManagerTest("testPane2"));
+			addTest(new MissionManagerTest("testPane3"));
+			addTest(new MissionManagerTest("testPane4"));
+			addTest(new MissionManagerTest("testNormalPane"));
+			addTest(new MissionManagerTest("testPane11"));
 		}
 	}
 }

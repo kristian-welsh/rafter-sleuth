@@ -1,7 +1,7 @@
 package {
 	import flash.display.MovieClip;
 	
-	public class PlayerManager {
+	public class PlayerManager implements PlayerData {
 		static private const IDLE_RIGHT_FRAME:Number = 1;
 		static private const IDLE_LEFT_FRAME:Number = 2;
 		static private const WALK_RIGHT_FRAME:Number = 3;
