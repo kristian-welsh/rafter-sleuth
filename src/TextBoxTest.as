@@ -34,8 +34,8 @@ package  {
 			assertFalse(view.visible);
 		}
 		
-		public function currentTextPane_returns_0():void {
-			assertEquals(0, textBox.currentTextPane);
+		public function currentTextPane_returns_1():void {
+			assertEquals(1, textBox.currentTextPane);
 		}
 		
 		public function get_box_does_not_throw_error():void {

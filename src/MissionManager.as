@@ -46,6 +46,8 @@ package {
 			if (!textBox.visible)
 				return;
 			switch (textBox.currentTextPane) {
+				default:
+					throw new Error("Unexpected case in switch statement of MissionManager::checkForText");
 				case 1:
 					pane1();
 					break;
@@ -65,7 +67,7 @@ package {
 				case 9:
 				case 10:
 					normalPane(textBox.currentTextPane);
-					break;
+					break;checkForText
 				case 11:
 					textBox.displayTextPane(12)
 					_tutorialProgress = 13;
@@ -109,16 +111,14 @@ package {
 		}
 		
 		private function pane1():void {
-			textBox.displayTextPane(2);
-			_tutorialProgress = 2;
+			normalPane(1);
 			_canAdvanceText = false;
 			player.canMove = true;
 		}
 		
 		private function pane2():void {
 			if (_canAdvanceText) {
-				textBox.displayTextPane(3);
-				_tutorialProgress = 3;
+				normalPane(2);
 				_canAdvanceText = false;
 				player.canJump = true;
 				player.canMove = false;
@@ -127,8 +127,7 @@ package {
 		
 		private function pane3():void {
 			if (_canAdvanceText) {
-				textBox.displayTextPane(4);
-				_tutorialProgress = 4;
+				normalPane(3);
 				_canAdvanceText = false;
 				player.canJump = false;
 				player.canAttack = true;
@@ -137,8 +136,7 @@ package {
 		
 		private function pane4():void {
 			if (_canAdvanceText) {
-				textBox.displayTextPane(5);
-				_tutorialProgress = 5;
+				normalPane(4);
 				player.canAttack = false;
 			}
 		}

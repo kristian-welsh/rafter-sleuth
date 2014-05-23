@@ -3,7 +3,7 @@ package  {
 
 	public class TextBox {
 		private var view:MovieClip;
-		private var textPaneNumber:uint;
+		private var textPaneNumber:uint = 1;
 		
 		public function TextBox(view:MovieClip) {
 			this.view = view;
