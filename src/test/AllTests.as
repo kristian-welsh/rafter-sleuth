@@ -13,6 +13,7 @@ package test {
 			addTest(new MissionManagerTest("testPane3"));
 			addTest(new MissionManagerTest("testPane4"));
 			addTest(new MissionManagerTest("testNormalPane"));
+			addTest(new MissionManagerTest("testPane11"));
 		}
 	}
 }

@@ -1,7 +1,7 @@
 package {
 	import flash.display.MovieClip;
 	
-	public class LevelManager {
+	public class LevelManager implements ILevelManager {
 		private var savedY:Number;
 		private var savedX:Number;
 		private var _view:MovieClip;
@@ -34,7 +34,7 @@ package {
 			}
 		}
 		
-		public function resetLevel(levelNumber:Number):void {
+		public function resetLevel(levelNumber:int):void {
 			enterLevel(levelNumber);
 			if (levelNumber != 1) {
 				resetMissionObjects();
@@ -96,6 +96,14 @@ package {
 			if (currentLevel != 1) {
 				displayReleventMissionObjects();
 			}
+		}
+		
+		public function officerRunAway():void {
+			view.officer.gotoAndPlay(7);
+		}
+		
+		public function playMissionRunners():void {
+			view.missionRunners.play();
 		}
 		
 		public function get view():MovieClip {

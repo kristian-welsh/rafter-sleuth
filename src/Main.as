@@ -243,7 +243,7 @@ package {
 						if (level.view.missionRunners.currentFrame != 105) {
 							soundManager.playCompleteSound();
 						}
-						level.view.missionRunners.gotoAndStop(105)
+						level.view.missionRunners.gotoAndStop(105);
 					}
 				}
 			}

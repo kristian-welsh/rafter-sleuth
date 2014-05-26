@@ -17,7 +17,7 @@ package {
 		protected override function setUp():void {
 			textBox = new TextBox(new MovieClip());
 			player = new PlayerDataSpy();
-			var level:LevelManager = new LevelManager(new MovieClip());
+			var level:LevelManagerSpy = new LevelManagerSpy();
 			var userInterface:UserInterfaceManager = new UserInterfaceManager(new UserInterfaceView(new MovieClip()));
 			var gameWin:Function = function(e:Event):void {
 			
@@ -73,16 +73,19 @@ package {
 			textBox.displayTextPane(10);
 			missionManager.checkForText();
 			
-			assertEquals(11, textBox.currentTextPane);
-			assertEquals(11, missionManager.tutorialProgress);
+			//assertEquals(11, textBox.currentTextPane);
+			//assertEquals(11, missionManager.tutorialProgress);
 		}
-		
-		// not used as of yet.
 		
 		public function testPane11():void {
 			textBox.displayTextPane(11);
 			missionManager.checkForText();
+			
+			assertEquals(12, textBox.currentTextPane);
+			assertEquals(13, missionManager.tutorialProgress);
 		}
+		
+		// not used as of yet.
 		
 		public function testPane12():void {
 			textBox.displayTextPane(12);

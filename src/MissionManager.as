@@ -5,7 +5,7 @@ package {
 	public class MissionManager {
 		private var textBox:TextBox;
 		private var player:PlayerData;
-		private var level:LevelManager;
+		private var level:ILevelManager;
 		private var userInterface:UserInterfaceManager;
 		private var winGame:Function;
 		
@@ -34,7 +34,7 @@ package {
 			return _tutorialProgress;
 		}
 		
-		public function MissionManager(textBox:TextBox, player:PlayerData, level:LevelManager, userInterface:UserInterfaceManager, winGame:Function) {
+		public function MissionManager(textBox:TextBox, player:PlayerData, level:ILevelManager, userInterface:UserInterfaceManager, winGame:Function) {
 			this.level = level;
 			this.player = player;
 			this.textBox = textBox;
@@ -75,8 +75,8 @@ package {
 					player.canJump = true;
 					player.canAttack = true;
 					player.canMove = true;
-					level.view.officer.gotoAndPlay(7); // extract funciton on level
-					level.view.missionRunners.play();
+					level.officerRunAway();
+					level.playMissionRunners();
 					break;
 				case 12:
 					textBox.displayTextPane(13);
@@ -88,7 +88,7 @@ package {
 					userInterface.startMission();
 					break;
 				case 13:
-					level.view.missionRunners.play();
+					level.playMissionRunners();
 					textBox.displayTextPane(14);
 					textBox.box.PlayAgain.addEventListener(MouseEvent.CLICK, winGame);
 					break;
