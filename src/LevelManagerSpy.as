@@ -67,5 +67,9 @@ package  {
 		public function get view():MovieClip {
 			return _view;
 		}
+		
+		public function getSpy():Spy {
+			return spy;
+		}
 	}
 }

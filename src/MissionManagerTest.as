@@ -1,7 +1,9 @@
 package {
+	import asunit.framework.Assert;
 	import asunit.framework.TestCase;
 	import flash.display.MovieClip;
 	import flash.events.Event;
+	import test.Spy;
 	import ui.UserInterfaceManager;
 	import ui.UserInterfaceView;
 	
@@ -9,6 +11,7 @@ package {
 		private var textBox:TextBox;
 		private var missionManager:MissionManager;
 		private var player:PlayerDataSpy;
+		private var level:LevelManagerSpy;
 		
 		public function MissionManagerTest(testMethod:String):void {
 			super(testMethod);
@@ -17,7 +20,7 @@ package {
 		protected override function setUp():void {
 			textBox = new TextBox(new MovieClip());
 			player = new PlayerDataSpy();
-			var level:LevelManagerSpy = new LevelManagerSpy();
+			level = new LevelManagerSpy();
 			var userInterface:UserInterfaceManager = new UserInterfaceManager(new UserInterfaceView(new MovieClip()));
 			var gameWin:Function = function(e:Event):void {
 			
@@ -32,7 +35,8 @@ package {
 			assertEquals(2, textBox.currentTextPane);
 			assertEquals(2, missionManager.tutorialProgress);
 			assertFalse(missionManager.canAdvanceText);
-			player.getSpy().assertCalledWithArguments(player.setCanMove, [true]);
+			
+			player.assertState("Mja");
 		}
 		
 		public function testPane2():void {
@@ -43,8 +47,7 @@ package {
 			assertEquals(3, missionManager.tutorialProgress);
 			assertFalse(missionManager.canAdvanceText);
 			
-			player.getSpy().assertCalledWithArguments(player.setCanJump, [true]);
-			player.getSpy().assertCalledWithArguments(player.setCanMove, [false]);
+			player.assertState("mJa");
 		}
 		
 		public function testPane3():void {
@@ -55,8 +58,7 @@ package {
 			assertEquals(4, missionManager.tutorialProgress);
 			assertFalse(missionManager.canAdvanceText);
 			
-			player.getSpy().assertCalledWithArguments(player.setCanJump, [false]);
-			player.getSpy().assertCalledWithArguments(player.setCanAttack, [true]);
+			player.assertState("mjA");
 		}
 		
 		public function testPane4():void {
@@ -66,15 +68,15 @@ package {
 			assertEquals(5, textBox.currentTextPane);
 			assertEquals(5, missionManager.tutorialProgress);
 			
-			player.getSpy().assertCalledWithArguments(player.setCanAttack, [false]);
+			player.assertState("mja");
 		}
 		
 		public function testNormalPane():void {
 			textBox.displayTextPane(10);
 			missionManager.checkForText();
 			
-			//assertEquals(11, textBox.currentTextPane);
-			//assertEquals(11, missionManager.tutorialProgress);
+			assertEquals(11, textBox.currentTextPane);
+			assertEquals(11, missionManager.tutorialProgress);
 		}
 		
 		public function testPane11():void {
@@ -83,9 +85,15 @@ package {
 			
 			assertEquals(12, textBox.currentTextPane);
 			assertEquals(13, missionManager.tutorialProgress);
+			assertFalse(textBox.visible);
+			
+			player.assertState("MJA");
+			
+			assertCalled(level, level.officerRunAway);
+			assertCalled(level, level.playMissionRunners);
 		}
 		
-		// not used as of yet.
+		// Not used as of yet.
 		
 		public function testPane12():void {
 			textBox.displayTextPane(12);
@@ -115,6 +123,19 @@ package {
 		public function testPane17():void {
 			textBox.displayTextPane(17);
 			missionManager.checkForText();
+		}
+		
+		/**
+		 * @param	object Assumed to have a Object::getSpy instance function.
+		 * @param	expectedFunction Assumed to be an instance function of object that is logged on spy.
+		 */
+		private function assertCalled(object:Object, expectedFunction:Function, expectedArguments:Array = null):void {
+			assert(object.getSpy, "object does not have a function named " + expectedFunction);
+			var spy:Spy = object.getSpy();
+			if(expectedArguments == null)
+				spy.assertCalled(expectedFunction);
+			else
+				spy.assertCalledWithArguments(expectedFunction, expectedArguments);
 		}
 	}
 }

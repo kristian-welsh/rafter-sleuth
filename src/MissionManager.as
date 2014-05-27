@@ -66,17 +66,10 @@ package {
 				case 8:
 				case 9:
 				case 10:
-					normalPane(textBox.currentTextPane);
-					break;checkForText
+					tutorialPane(textBox.currentTextPane);
+					break;
 				case 11:
-					textBox.displayTextPane(12)
-					_tutorialProgress = 13;
-					textBox.hide();
-					player.canJump = true;
-					player.canAttack = true;
-					player.canMove = true;
-					level.officerRunAway();
-					level.playMissionRunners();
+					pane11();
 					break;
 				case 12:
 					textBox.displayTextPane(13);
@@ -111,14 +104,14 @@ package {
 		}
 		
 		private function pane1():void {
-			normalPane(1);
+			tutorialPane(1);
 			_canAdvanceText = false;
 			player.canMove = true;
 		}
 		
 		private function pane2():void {
 			if (_canAdvanceText) {
-				normalPane(2);
+				tutorialPane(2);
 				_canAdvanceText = false;
 				player.canJump = true;
 				player.canMove = false;
@@ -127,7 +120,7 @@ package {
 		
 		private function pane3():void {
 			if (_canAdvanceText) {
-				normalPane(3);
+				tutorialPane(3);
 				_canAdvanceText = false;
 				player.canJump = false;
 				player.canAttack = true;
@@ -136,14 +129,25 @@ package {
 		
 		private function pane4():void {
 			if (_canAdvanceText) {
-				normalPane(4);
+				tutorialPane(4);
 				player.canAttack = false;
 			}
 		}
 		
-		private function normalPane(paneNumber:uint):void {
+		private function tutorialPane(paneNumber:uint):void {
 			textBox.displayTextPane(paneNumber + 1);
 			_tutorialProgress = paneNumber + 1;
+		}
+		
+		private function pane11():void {
+			textBox.displayTextPane(12)
+			_tutorialProgress = 13;
+			textBox.hide();
+			player.canJump = true;
+			player.canAttack = true;
+			player.canMove = true;
+			level.officerRunAway();
+			level.playMissionRunners();
 		}
 	}
 }
