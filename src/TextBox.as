@@ -14,6 +14,14 @@ package  {
 			view.gotoAndStop(textPaneNumber);
 		}
 		
+		public function get currentTextPane():int {
+			return textPaneNumber;
+		}
+		
+		public function get box():MovieClip {
+			return view.box;
+		}
+		
 		public function get visible():Boolean {
 			return view.visible;
 		}
@@ -24,14 +32,6 @@ package  {
 		
 		public function hide():void {
 			view.visible = false;
-		}
-		
-		public function get currentTextPane():int {
-			return textPaneNumber;
-		}
-		
-		public function get box():MovieClip {
-			return view.box;
 		}
 	}
 }

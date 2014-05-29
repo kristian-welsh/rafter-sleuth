@@ -5,8 +5,8 @@ package  {
 	public class Console {
 		static public var INSTANCE:Console;
 		
-		var graphics:Sprite = new Sprite();
-		var text:TextField = new TextField();
+		private var graphics:Sprite = new Sprite();
+		private var text:TextField = new TextField();
 		
 		static public function createInstance(container:DisplayObjectContainer):void {
 			INSTANCE = new Console(container);

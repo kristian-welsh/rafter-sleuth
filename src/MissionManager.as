@@ -1,12 +1,12 @@
 package {
 	import flash.events.MouseEvent;
-	import ui.UserInterfaceManager;
+	import ui.UIManager;
 	
 	public class MissionManager {
 		private var textBox:TextBox;
 		private var player:PlayerData;
 		private var level:ILevelManager;
-		private var userInterface:UserInterfaceManager;
+		private var userInterface:UIManager;
 		private var winGame:Function;
 		
 		private var _canAdvanceText:Boolean = true;
@@ -34,7 +34,7 @@ package {
 			return _tutorialProgress;
 		}
 		
-		public function MissionManager(textBox:TextBox, player:PlayerData, level:ILevelManager, userInterface:UserInterfaceManager, winGame:Function) {
+		public function MissionManager(textBox:TextBox, player:PlayerData, level:ILevelManager, userInterface:UIManager, winGame:Function) {
 			this.level = level;
 			this.player = player;
 			this.textBox = textBox;
@@ -72,13 +72,7 @@ package {
 					pane11();
 					break;
 				case 12:
-					textBox.displayTextPane(13);
-					_currentMission = 1
-					textBox.hide();
-					player.canMove = true;
-					player.canJump = true;
-					player.canAttack = true;
-					userInterface.startMission();
+					pane12();
 					break;
 				case 13:
 					level.playMissionRunners();
@@ -86,7 +80,7 @@ package {
 					textBox.box.PlayAgain.addEventListener(MouseEvent.CLICK, winGame);
 					break;
 				case 14:
-					textBox.hide()
+					textBox.hide();
 					player.canMove = true;
 					player.canJump = true;
 					player.canAttack = true;
@@ -106,15 +100,20 @@ package {
 		private function pane1():void {
 			tutorialPane(1);
 			_canAdvanceText = false;
+			
 			player.canMove = true;
+			player.canJump = false;
+			player.canAttack = false;
 		}
 		
 		private function pane2():void {
 			if (_canAdvanceText) {
 				tutorialPane(2);
 				_canAdvanceText = false;
-				player.canJump = true;
+				
 				player.canMove = false;
+				player.canJump = true;
+				player.canAttack = false;
 			}
 		}
 		
@@ -122,6 +121,8 @@ package {
 			if (_canAdvanceText) {
 				tutorialPane(3);
 				_canAdvanceText = false;
+				
+				player.canMove = false;
 				player.canJump = false;
 				player.canAttack = true;
 			}
@@ -130,6 +131,9 @@ package {
 		private function pane4():void {
 			if (_canAdvanceText) {
 				tutorialPane(4);
+				
+				player.canMove = false;
+				player.canJump = false;
 				player.canAttack = false;
 			}
 		}
@@ -143,11 +147,22 @@ package {
 			textBox.displayTextPane(12)
 			_tutorialProgress = 13;
 			textBox.hide();
+			
+			player.canMove = true;
 			player.canJump = true;
 			player.canAttack = true;
-			player.canMove = true;
 			level.officerRunAway();
 			level.playMissionRunners();
+		}
+		
+		private function pane12():void {
+			textBox.displayTextPane(13);
+			_currentMission = 1;
+			textBox.hide();
+			player.canMove = true;
+			player.canJump = true;
+			player.canAttack = true;
+			userInterface.startMission();
 		}
 	}
 }

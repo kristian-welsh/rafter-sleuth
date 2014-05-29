@@ -1,17 +1,18 @@
 package {
-	import asunit.framework.Assert;
 	import asunit.framework.TestCase;
 	import flash.display.MovieClip;
 	import flash.events.Event;
 	import test.Spy;
+	import ui.UIManagerFake;
+	import ui.UIViewFake;
 	import ui.UserInterfaceManager;
-	import ui.UserInterfaceView;
 	
 	public class MissionManagerTest extends TestCase {
 		private var textBox:TextBox;
 		private var missionManager:MissionManager;
 		private var player:PlayerDataSpy;
 		private var level:LevelManagerSpy;
+		private var userInterface:UIManagerFake;
 		
 		public function MissionManagerTest(testMethod:String):void {
 			super(testMethod);
@@ -21,7 +22,7 @@ package {
 			textBox = new TextBox(new MovieClip());
 			player = new PlayerDataSpy();
 			level = new LevelManagerSpy();
-			var userInterface:UserInterfaceManager = new UserInterfaceManager(new UserInterfaceView(new MovieClip()));
+			userInterface = new UIManagerFake();
 			var gameWin:Function = function(e:Event):void {
 			
 			}
@@ -29,6 +30,8 @@ package {
 		}
 		
 		public function testPane1():void {
+			player.prepareAssertState("Mja");
+			
 			textBox.displayTextPane(1);
 			missionManager.checkForText();
 			
@@ -40,6 +43,8 @@ package {
 		}
 		
 		public function testPane2():void {
+			player.prepareAssertState("mJa");
+			
 			textBox.displayTextPane(2);
 			missionManager.checkForText();
 			
@@ -51,6 +56,8 @@ package {
 		}
 		
 		public function testPane3():void {
+			player.prepareAssertState("mjA");
+			
 			textBox.displayTextPane(3);
 			missionManager.checkForText();
 			
@@ -62,6 +69,8 @@ package {
 		}
 		
 		public function testPane4():void {
+			player.prepareAssertState("mja");
+			
 			textBox.displayTextPane(4);
 			missionManager.checkForText();
 			
@@ -80,6 +89,9 @@ package {
 		}
 		
 		public function testPane11():void {
+			player.prepareAssertState("MJA");
+			textBox.show();
+			
 			textBox.displayTextPane(11);
 			missionManager.checkForText();
 			
@@ -93,12 +105,22 @@ package {
 			assertCalled(level, level.playMissionRunners);
 		}
 		
-		// Not used as of yet.
-		
 		public function testPane12():void {
+			textBox.show();
+			player.prepareAssertState("MJA");
+			
 			textBox.displayTextPane(12);
 			missionManager.checkForText();
+		
+			assertEquals(13, textBox.currentTextPane);
+			assertEquals(1, missionManager.currentMission);
+			assertFalse(textBox.visible);
+			player.assertState("MJA");
+			
+			assertCalled(userInterface, userInterface.startMission);
 		}
+		
+		// Not used as of yet.
 		
 		public function testPane13():void {
 			textBox.displayTextPane(13);
@@ -132,7 +154,7 @@ package {
 		private function assertCalled(object:Object, expectedFunction:Function, expectedArguments:Array = null):void {
 			assert(object.getSpy, "object does not have a function named " + expectedFunction);
 			var spy:Spy = object.getSpy();
-			if(expectedArguments == null)
+			if (expectedArguments == null)
 				spy.assertCalled(expectedFunction);
 			else
 				spy.assertCalledWithArguments(expectedFunction, expectedArguments);

@@ -14,6 +14,7 @@ package test {
 			addTest(new MissionManagerTest("testPane4"));
 			addTest(new MissionManagerTest("testNormalPane"));
 			addTest(new MissionManagerTest("testPane11"));
+			addTest(new MissionManagerTest("testPane12"));
 		}
 	}
 }

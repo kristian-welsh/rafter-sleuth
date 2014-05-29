@@ -1,7 +1,7 @@
 package ui {
 	import flash.display.MovieClip;
-
-	public class UserInterfaceManager {
+	
+	public class UserInterfaceManager implements UIManager {
 		private var _view:UIView;
 		private var score:uint;
 		private var _lives:uint = 6;
