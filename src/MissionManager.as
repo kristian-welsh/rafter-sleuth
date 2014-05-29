@@ -75,9 +75,7 @@ package {
 					pane12();
 					break;
 				case 13:
-					level.playMissionRunners();
-					textBox.displayTextPane(14);
-					textBox.box.PlayAgain.addEventListener(MouseEvent.CLICK, winGame);
+					pane13();
 					break;
 				case 14:
 					textBox.hide();
@@ -86,13 +84,13 @@ package {
 					player.canAttack = true;
 					break;
 				case 15:
-					// end game
+					endGame();
 					break;
 				case 16:
 					textBox.displayTextPane(17);
 					break;
 				case 17:
-					// end game
+					endGame();
 					break;
 			}
 		}
@@ -163,6 +161,16 @@ package {
 			player.canJump = true;
 			player.canAttack = true;
 			userInterface.startMission();
+		}
+		
+		private function endGame():void {
+			// not yet implemented
+		}
+		
+		private function pane13():void {
+			textBox.displayTextPane(14);
+			textBox.whenPlayAgainClickedExecute(winGame);
+			level.playMissionRunners();
 		}
 	}
 }

@@ -4,28 +4,26 @@ package {
 	import flash.events.Event;
 	import test.Spy;
 	import ui.UIManagerFake;
-	import ui.UIViewFake;
-	import ui.UserInterfaceManager;
 	
 	public class MissionManagerTest extends TestCase {
-		private var textBox:TextBox;
+		private var textBox:TextBoxSpy;
 		private var missionManager:MissionManager;
 		private var player:PlayerDataSpy;
 		private var level:LevelManagerSpy;
 		private var userInterface:UIManagerFake;
+		private var gameWin:Function = function(e:Event):void {
+		
+		};
 		
 		public function MissionManagerTest(testMethod:String):void {
 			super(testMethod);
 		}
 		
 		protected override function setUp():void {
-			textBox = new TextBox(new MovieClip());
+			textBox = new TextBoxSpy();
 			player = new PlayerDataSpy();
 			level = new LevelManagerSpy();
 			userInterface = new UIManagerFake();
-			var gameWin:Function = function(e:Event):void {
-			
-			}
 			missionManager = new MissionManager(textBox, player, level, userInterface, gameWin);
 		}
 		
@@ -80,7 +78,7 @@ package {
 			player.assertState("mja");
 		}
 		
-		public function testNormalPane():void {
+		public function testtutorialPane():void {
 			textBox.displayTextPane(10);
 			missionManager.checkForText();
 			
@@ -111,7 +109,7 @@ package {
 			
 			textBox.displayTextPane(12);
 			missionManager.checkForText();
-		
+			
 			assertEquals(13, textBox.currentTextPane);
 			assertEquals(1, missionManager.currentMission);
 			assertFalse(textBox.visible);
@@ -125,6 +123,10 @@ package {
 		public function testPane13():void {
 			textBox.displayTextPane(13);
 			missionManager.checkForText();
+		
+			assertEquals(14, textBox.currentTextPane);
+			assertCalled(textBox, textBox.whenPlayAgainClickedExecute, [gameWin]);
+			assertCalled(level, level.playMissionRunners);
 		}
 		
 		public function testPane14():void {

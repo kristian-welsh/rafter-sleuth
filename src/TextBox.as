@@ -1,5 +1,6 @@
 package  {
 	import flash.display.MovieClip;
+	import flash.events.MouseEvent;
 
 	public class TextBox {
 		private var view:MovieClip;
@@ -32,6 +33,10 @@ package  {
 		
 		public function hide():void {
 			view.visible = false;
+		}
+		
+		public function whenPlayAgainClickedExecute(func:Function):void {
+			view.box.PlayAgain.addEventListener(MouseEvent.CLICK, func);
 		}
 	}
 }
