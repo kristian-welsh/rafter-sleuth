@@ -81,10 +81,7 @@ package src {
 					pane13();
 					break;
 				case 14:
-					textBox.hide();
-					player.canMove = true;
-					player.canJump = true;
-					player.canAttack = true;
+					pane14();
 					break;
 				case 15:
 					endGame();
@@ -166,14 +163,21 @@ package src {
 			userInterface.startMission();
 		}
 		
-		private function endGame():void {
-			// not yet implemented
-		}
-		
 		private function pane13():void {
 			textBox.displayTextPane(14);
 			textBox.whenPlayAgainClickedExecute(winGame);
 			level.playMissionRunners();
+		}
+		
+		private function pane14():void {
+			textBox.hide();
+			player.canMove = true;
+			player.canJump = true;
+			player.canAttack = true;
+		}
+		
+		private function endGame():void {
+			// not yet implemented
 		}
 	}
 }

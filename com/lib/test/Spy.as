@@ -16,8 +16,9 @@ package lib.test {
 		}
 		
 		/**
+		 * Adds a function call to the log.
 		 * @param	functionCalled A referance to the function that has been called.
-		 * @param	args Order dependant list of srguments passed to the function
+		 * @param	args An order dependant list of arguments that were passed to the function.
 		 */
 		public function log(functionCalled:Function, args:Array = null):void {
 			functionLog.push(functionCalled);
@@ -25,18 +26,22 @@ package lib.test {
 		}
 		
 		/**
-		 * Asserts that the funciton has been logged.
+		 * Asserts that the funciton has been logged as expected.
 		 */
-		public function assertCalled(expectedFunction:Function):void {
-			if (!Util.listContainsItem(functionLog, expectedFunction))
-				failNotCalled(expectedFunction);
+		public function assertLogged(expectedFunction:Function, expectedArguments:Array = null):void {
+			if (expectedArguments == null)
+				assertLoggedWithoutArguments(expectedFunction);
+			else
+				assertLoggedWithArguments(expectedFunction, expectedArguments);
 		}
 		
-		/**
-		 * Asserts that the funciton has been logged with the expected arguments.
-		 */
-		public function assertCalledWithArguments(expectedFunction:Function, expectedArguments:Array):void {
-			assertCalled(expectedFunction);
+		private function assertLoggedWithoutArguments(expectedFunction:Function):void {
+			if (!Util.listContainsItem(functionLog, expectedFunction))
+				failNotLogged(expectedFunction);
+		}
+		
+		private function assertLoggedWithArguments(expectedFunction:Function, expectedArguments:Array):void {
+			assertLoggedWithoutArguments(expectedFunction);
 			for (var functionIndex:uint = 0; functionIndex < functionLog.length; ++functionIndex) {
 				if (expectedFunction == functionLog[functionIndex]) {
 					if (argsMatch(argumentLog[functionIndex], expectedArguments))
@@ -58,30 +63,30 @@ package lib.test {
 		/**
 		 * Asserts that the funciton has not been logged.
 		 */
-		public function assertNotCalled(expectedFunction:Function):void {
+		public function assertNotLogged(expectedFunction:Function):void {
 			if (Util.listContainsItem(functionLog, expectedFunction))
-				failNotCalled(expectedFunction);
+				failNotLogged(expectedFunction);
 		}
 		
 		/**
 		 * Asserts that no funciton has been logged.
 		 */
-		public function assertNotUsed():void {
+		public function assertNoLogs():void {
 			if (functionLog.length != 0)
-				failAnyFunctionCalled();
+				failAnyFunctionLogged();
 		}
 		
-		private function failNotCalled(expectedFunction:Function):void {
+		private function failNotLogged(expectedFunction:Function):void {
 			var expectedFunctionName:String = Util.getFunctionName(expectedFunction, target); // possibly breaks if not logged from a subclass
 			fail("Expected function \"" + expectedFunctionName + "\" to have been called, but it was not.");
 		}
 		
-		private function failCalled(expectedFunction:Function):void {
+		private function failLogged(expectedFunction:Function):void {
 			var expectedFunctionName:String = Util.getFunctionName(expectedFunction, target);
 			fail("Expected function \"" + expectedFunctionName + "\" to not have been called, but it was.");
 		}
 		
-		private function failAnyFunctionCalled():void {
+		private function failAnyFunctionLogged():void {
 			fail("Expected no function to have been called, but a funciton was called.");
 		}
 	}

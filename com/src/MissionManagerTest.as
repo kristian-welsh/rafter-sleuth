@@ -81,7 +81,7 @@ package src {
 			player.assertState("mja");
 		}
 		
-		public function testtutorialPane():void {
+		public function testTutorialPane():void {
 			textBox.displayTextPane(10);
 			missionManager.checkForText();
 			
@@ -102,8 +102,8 @@ package src {
 			
 			player.assertState("MJA");
 			
-			assertCalled(level, level.officerRunAway);
-			assertCalled(level, level.playMissionRunners);
+			level.getSpy().assertLogged(level.officerRunAway);
+			level.getSpy().assertLogged(level.playMissionRunners);
 		}
 		
 		public function testPane12():void {
@@ -118,7 +118,7 @@ package src {
 			assertFalse(textBox.visible);
 			player.assertState("MJA");
 			
-			assertCalled(userInterface, userInterface.startMission);
+			userInterface.getSpy().assertLogged(userInterface.startMission);
 		}
 		
 		public function testPane13():void {
@@ -126,43 +126,37 @@ package src {
 			missionManager.checkForText();
 			
 			assertEquals(14, textBox.currentTextPane);
-			assertCalled(textBox, textBox.whenPlayAgainClickedExecute, [gameWin]);
-			assertCalled(level, level.playMissionRunners);
+			textBox.getSpy().assertLogged(textBox.whenPlayAgainClickedExecute, [gameWin]);
+			level.getSpy().assertLogged(level.playMissionRunners);
 		}
-		
-		// Not used as of yet.
 		
 		public function testPane14():void {
 			textBox.displayTextPane(14);
 			missionManager.checkForText();
+			
+			assertFalse(textBox.visible);
+			player.assertState("MJA");
 		}
 		
 		public function testPane15():void {
 			textBox.displayTextPane(15);
 			missionManager.checkForText();
+			
+			// end game not yet implemented so no behaviour to test here.
 		}
 		
 		public function testPane16():void {
 			textBox.displayTextPane(16);
 			missionManager.checkForText();
+			
+			assertEquals(17, textBox.currentTextPane);
 		}
 		
 		public function testPane17():void {
 			textBox.displayTextPane(17);
 			missionManager.checkForText();
-		}
-		
-		/**
-		 * @param	object Assumed to have a Object::getSpy instance function.
-		 * @param	expectedFunction Assumed to be an instance function of object that is logged on spy.
-		 */
-		private function assertCalled(object:Object, expectedFunction:Function, expectedArguments:Array = null):void {
-			assert(object.getSpy, "object does not have a function named " + expectedFunction);
-			var spy:Spy = object.getSpy();
-			if (expectedArguments == null)
-				spy.assertCalled(expectedFunction);
-			else
-				spy.assertCalledWithArguments(expectedFunction, expectedArguments);
+			
+			// end game not yet implemented so no behaviour to test here.
 		}
 	}
 }

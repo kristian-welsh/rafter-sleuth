@@ -24,7 +24,7 @@ package src.keyboard {
 			_spy.log(attack);
 		}
 		
-		public function get spy():Spy {
+		public function getSpy():Spy {
 			return _spy;
 		}
 	}

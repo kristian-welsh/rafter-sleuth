@@ -4,7 +4,7 @@ package src.ui {
 	public class UserInterfaceViewSpy implements UIView {
 		private var _spy:Spy;
 		
-		public function get spy():Spy {
+		public function getSpy():Spy {
 			return _spy;
 		}
 		

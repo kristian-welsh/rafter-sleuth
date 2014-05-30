@@ -16,41 +16,41 @@ package src.ui {
 		
 		public function initialize():void {
 			userInterface.initialize();
-			view.spy.assertCalled(view.hideItemIcon);
-			view.spy.assertCalled(view.hideQuestIcon);
-			view.spy.assertCalledWithArguments(view.setMinuteHandRotation, [21]);
-			view.spy.assertCalledWithArguments(view.setSecondHandRotation, [21]);
-			view.spy.assertCalledWithArguments(view.setLives, [6]);
+			view.getSpy().assertLogged(view.hideItemIcon);
+			view.getSpy().assertLogged(view.hideQuestIcon);
+			view.getSpy().assertLogged(view.setMinuteHandRotation, [21]);
+			view.getSpy().assertLogged(view.setSecondHandRotation, [21]);
+			view.getSpy().assertLogged(view.setLives, [6]);
 		}
 		
 		public function startMission():void {
 			userInterface.startMission();
-			view.spy.assertCalled(view.showItemIcon);
-			view.spy.assertCalled(view.hideQuestIcon);
-			view.spy.assertCalled(view.showClockHands);
-			view.spy.assertCalledWithArguments(view.setMinuteHandRotation, [21]);
-			view.spy.assertCalledWithArguments(view.setSecondHandRotation, [21]);
+			view.getSpy().assertLogged(view.showItemIcon);
+			view.getSpy().assertLogged(view.hideQuestIcon);
+			view.getSpy().assertLogged(view.showClockHands);
+			view.getSpy().assertLogged(view.setMinuteHandRotation, [21]);
+			view.getSpy().assertLogged(view.setSecondHandRotation, [21]);
 		}
 		
 		public function reset():void {
 			userInterface.reset();
-			view.spy.assertCalled(view.hideItemIcon);
-			view.spy.assertCalled(view.hideQuestIcon);
-			view.spy.assertCalled(view.hideClockHands);
-			view.spy.assertCalledWithArguments(view.setMinuteHandRotation, [21]);
-			view.spy.assertCalledWithArguments(view.setSecondHandRotation, [21]);
-			view.spy.assertCalledWithArguments(view.setScore, [0]);
-			view.spy.assertCalledWithArguments(view.setLives, [6]);
+			view.getSpy().assertLogged(view.hideItemIcon);
+			view.getSpy().assertLogged(view.hideQuestIcon);
+			view.getSpy().assertLogged(view.hideClockHands);
+			view.getSpy().assertLogged(view.setMinuteHandRotation, [21]);
+			view.getSpy().assertLogged(view.setSecondHandRotation, [21]);
+			view.getSpy().assertLogged(view.setScore, [0]);
+			view.getSpy().assertLogged(view.setLives, [6]);
 		}
 		
 		public function showQuestIcon():void {
 			userInterface.showQuestIcon();
-			view.spy.assertCalled(view.showQuestIcon);
+			view.getSpy().assertLogged(view.showQuestIcon);
 		}
 		
 		public function hideQuestIcon():void {
 			userInterface.hideQuestIcon();
-			view.spy.assertCalled(view.hideQuestIcon);
+			view.getSpy().assertLogged(view.hideQuestIcon);
 		}
 		
 		public function isQuestIconVisible():void {
@@ -59,32 +59,32 @@ package src.ui {
 		
 		public function showInterface():void {
 			userInterface.showInterface()
-			view.spy.assertCalled(view.show);
+			view.getSpy().assertLogged(view.show);
 		}
 		
 		public function hideInterface():void {
 			userInterface.hideInterface()
-			view.spy.assertCalled(view.hide);
+			view.getSpy().assertLogged(view.hide);
 		}
 		
 		public function showItemIcon():void {
 			userInterface.showItemIcon()
-			view.spy.assertCalled(view.showItemIcon);
+			view.getSpy().assertLogged(view.showItemIcon);
 		}
 		
 		public function hideItemIcon():void {
 			userInterface.hideItemIcon()
-			view.spy.assertCalled(view.hideItemIcon);
+			view.getSpy().assertLogged(view.hideItemIcon);
 		}
 		
 		public function tickSecondHand():void {
 			userInterface.tickSecondHand()
-			view.spy.assertCalledWithArguments(view.addSecondHandRotation, [6]);
+			view.getSpy().assertLogged(view.addSecondHandRotation, [6]);
 		}
 		
 		public function tickMinuteHand():void {
 			userInterface.tickMinuteHand()
-			view.spy.assertCalledWithArguments(view.addMinuteHandRotation, [0.5]);
+			view.getSpy().assertLogged(view.addMinuteHandRotation, [0.5]);
 		}
 		
 		public function clockFinished():void {
@@ -97,12 +97,12 @@ package src.ui {
 		
 		public function increaseScore():void {
 			userInterface.increaseScore();
-			view.spy.assertCalledWithArguments(view.setScore, [1]);
+			view.getSpy().assertLogged(view.setScore, [1]);
 		}
 		
 		public function increaseLives():void {
 			userInterface.increaseLives();
-			view.spy.assertCalledWithArguments(view.setLives, [7]);
+			view.getSpy().assertLogged(view.setLives, [7]);
 		}
 		
 		private function assertClockFinishedTrue(minutes:Number, seconds:Number):void {

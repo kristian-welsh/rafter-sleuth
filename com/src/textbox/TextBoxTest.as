@@ -44,7 +44,7 @@ package src.textbox {
 		
 		public function displayTextPane_calls_gotoAndStop_on_view():void {
 			textBox.displayTextPane(0);
-			view.spy.assertCalled(view.gotoAndStop);
+			view.spy.assertLogged(view.gotoAndStop);
 		}
 	}
 }
