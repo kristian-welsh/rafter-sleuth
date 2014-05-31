@@ -1,35 +1,44 @@
 package src.player {
-	import asunit.framework.Assert;
 	import lib.assert;
-	import src.BooleanStringCode;
+	import lib.test.BooleanStringCode;
 	
 	public class PlayerDataSpy implements PlayerData {
+		private static const MJA_ONLY_ERROR_MESSAGE:String = "expectedState needs to be a case insensitive string matching \"mja\"";
+		
 		private var code:BooleanStringCode = new BooleanStringCode();
 		
-		private var _canMove:Boolean;
-		private var _canJump:Boolean;
-		private var _canAttack:Boolean;
-		
 		public function set canMove(value:Boolean):void {
-			_canMove = value;
+			code.setCodeIndexValue(0, value);
 		}
 		
 		public function set canJump(value:Boolean):void {
-			_canJump = value;
+			code.setCodeIndexValue(1, value);
 		}
 		
 		public function set canAttack(value:Boolean):void {
-			_canAttack = value;
+			code.setCodeIndexValue(2, value);
 		}
 		
-		// TODO: From here onward should be a new class
-		
-		public function prepareAssertState(expectedStateCode:String):void {
-			code.prepareAssertState(expectedStateCode);
+		/**
+		 * @param	expectedState A string in the form of "mJa". M is canMove; J is canJump; and A is canAttack.
+		 * An upper case letter represents true, and a lower case represents false.
+		 */
+		public function prepareAssertState(anticipatedStateCode:String):void {
+			validateCode(anticipatedStateCode);
+			code.prepareAssertState(anticipatedStateCode);
 		}
 		
+		/**
+		 * @param	expectedState A string in the form of "mJa". M is canMove; J is canJump; and A is canAttack.
+		 * An upper case letter represents true, and a lower case represents false.
+		 */
 		public function assertState(expectedStateCode:String):void {
-			code.assertState(expectedStateCode, [_canMove, _canJump, _canAttack]);
+			validateCode(expectedStateCode);
+			code.assertState(expectedStateCode);
+		}
+		
+		private function validateCode(stateCode:String):void {
+			assert(stateCode.toUpperCase() == "MJA", MJA_ONLY_ERROR_MESSAGE);
 		}
 	}
 }
