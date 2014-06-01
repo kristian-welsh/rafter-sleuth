@@ -31,93 +31,84 @@ package src {
 		}
 		
 		public function testPane1():void {
-			player.prepareAssertState("Mja");
+			player.getData().prepareAssertState("Mja");
 			
 			textBox.displayTextPane(1);
 			missionManager.checkForText();
+			assertTutorialPane(1);
+			player.getData().assertState("Mja");
 			
-			assertEquals(2, textBox.currentTextPane);
-			assertEquals(2, missionManager.tutorialProgress);
 			assertFalse(missionManager.canAdvanceText);
-			
-			player.assertState("Mja");
+		}
+		
+		private function assertTutorialPane(previousPaneNumber:uint):void {
+			assertEquals(previousPaneNumber + 1, textBox.currentTextPane);
+			assertEquals(previousPaneNumber + 1, missionManager.tutorialProgress);
 		}
 		
 		public function testPane2():void {
-			player.prepareAssertState("mJa");
+			player.getData().prepareAssertState("mJa");
 			
 			textBox.displayTextPane(2);
 			missionManager.checkForText();
+			assertTutorialPane(2);
+			player.getData().assertState("mJa");
 			
-			assertEquals(3, textBox.currentTextPane);
-			assertEquals(3, missionManager.tutorialProgress);
 			assertFalse(missionManager.canAdvanceText);
-			
-			player.assertState("mJa");
 		}
 		
 		public function testPane3():void {
-			player.prepareAssertState("mjA");
+			player.getData().prepareAssertState("mjA");
 			
 			textBox.displayTextPane(3);
 			missionManager.checkForText();
+			assertTutorialPane(3);
+			player.getData().assertState("mjA");
 			
-			assertEquals(4, textBox.currentTextPane);
-			assertEquals(4, missionManager.tutorialProgress);
 			assertFalse(missionManager.canAdvanceText);
-			
-			player.assertState("mjA");
 		}
 		
 		public function testPane4():void {
-			player.prepareAssertState("mja");
+			player.getData().prepareAssertState("mja");
 			
 			textBox.displayTextPane(4);
 			missionManager.checkForText();
-			
-			assertEquals(5, textBox.currentTextPane);
-			assertEquals(5, missionManager.tutorialProgress);
-			
-			player.assertState("mja");
+			assertTutorialPane(4);
+			player.getData().assertState("mja");
 		}
 		
 		public function testTutorialPane():void {
 			textBox.displayTextPane(10);
 			missionManager.checkForText();
-			
-			assertEquals(11, textBox.currentTextPane);
-			assertEquals(11, missionManager.tutorialProgress);
+			assertTutorialPane(10);
 		}
 		
 		public function testPane11():void {
-			player.prepareAssertState("MJA");
+			player.getData().prepareAssertState("MJA");
 			textBox.show();
 			
 			textBox.displayTextPane(11);
 			missionManager.checkForText();
+			assertTutorialPane(11);
+			player.getData().assertState("MJA");
 			
-			assertEquals(12, textBox.currentTextPane);
-			assertEquals(13, missionManager.tutorialProgress);
 			assertFalse(textBox.visible);
-			
-			player.assertState("MJA");
-			
 			level.getSpy().assertLogged(level.officerRunAway);
 			level.getSpy().assertLogged(level.playMissionRunners);
 		}
 		
 		public function testPane12():void {
 			textBox.show();
-			player.prepareAssertState("MJA");
+			player.getData().prepareAssertState("MJA");
 			
 			textBox.displayTextPane(12);
 			missionManager.checkForText();
 			
 			assertEquals(13, textBox.currentTextPane);
 			assertEquals(1, missionManager.currentMission);
-			assertFalse(textBox.visible);
-			player.assertState("MJA");
+			player.getData().assertState("MJA");
 			
+			assertFalse(textBox.visible);
 			userInterface.getSpy().assertLogged(userInterface.startMission);
 		}
 		
@@ -135,14 +126,14 @@ package src {
 			missionManager.checkForText();
 			
 			assertFalse(textBox.visible);
-			player.assertState("MJA");
+			player.getData().assertState("MJA");
 		}
 		
 		public function testPane15():void {
 			textBox.displayTextPane(15);
 			missionManager.checkForText();
 			
-			// end game not yet implemented so no behaviour to test here.
+			assertGameEnded();
 		}
 		
 		public function testPane16():void {
@@ -156,6 +147,10 @@ package src {
 			textBox.displayTextPane(17);
 			missionManager.checkForText();
 			
+			assertGameEnded();
+		}
+		
+		private function assertGameEnded():void {
 			// end game not yet implemented so no behaviour to test here.
 		}
 	}

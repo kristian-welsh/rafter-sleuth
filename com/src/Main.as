@@ -290,7 +290,7 @@ package src {
 			player.view.addEventListener(Event.ENTER_FRAME, playerMove);
 			level.goToLevel(levelNumber);
 			if (level.currentLevel == 1) {
-				if (missionManager.tutorialProgress == 13) {
+				if (missionManager.tutorialProgress == 12) {
 					level.view.officer.gotoAndStop(31);
 				}
 				if (missionManager.currentMission == 1) {

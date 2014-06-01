@@ -1,60 +1,49 @@
 package lib.test {
 	import asunit.framework.Assert;
-	import lib.assert;
+	import lib.StringUtil;
 	
-	// TODO: Migrate from array access to hash lookup to make use more intuitive.
+	// TODO: ensure statecode is composed of uppercase or lowercase letters
 	public class BooleanStringCode {
+		private var state:Object = new Object()
 		
-		private var states:Vector.<Boolean> = new Vector.<Boolean>()
-		
-		public function setCodeIndexValue(number:uint, value:Boolean):void {
-			states[number] = value;
+		public function setValueKey(value:Boolean, key:String):void {
+			state[key.toLowerCase()] = value;
 		}
 		
 		/**
 		 * Sets state to a state that would fail every test if assertState is called directly after it.
 		 * @param	expectedState An upper case letter represents true, and a lower case represents false.
 		 */
-		public function prepareAssertState(anticipatedStateCode:String):void {
-			for (var valueIndex:uint = 0; valueIndex < anticipatedStateCode.length; ++valueIndex) {
-				var booleanCharValue:Boolean = toBoolean(anticipatedStateCode.charAt(valueIndex));
-				states.push(!booleanCharValue);
-			}
+		public function prepareAssertState(stateCode:String):void {
+			forEachChar(stateCode, function(char:String) {
+				state[char.toLowerCase()] = !toBoolean(char);
+			});
+		}
+		
+		/**
+		 * @param	func function to execute must accept a string as a parameter
+		 */
+		private function forEachChar(string:String, func:Function):void {
+			for (var charIndex:uint = 0; charIndex < string.length; ++charIndex)
+				func(string.charAt(charIndex));
+		}
+		
+		private function toBoolean(letter:String):Boolean {
+			return StringUtil.isUppercase(letter);
 		}
 		
 		/**
 		 * @param	expectedStateCode An upper case letter represents true, and a lower case represents false.
 		 * @param	actualState Needs to be the same length as expectedStateCode.
 		 */
-		public function assertState(expectedStateCode:String):void {
-			assert(expectedStateCode.length == states.length, "expectedStateCode needs to be the same length as anticipatedStateCode");
-			for (var stateIndex:uint = 0; stateIndex < expectedStateCode.length; ++stateIndex)
-				assertStateCharacter(expectedStateCode.charAt(stateIndex), states[stateIndex]);
+		public function assertState(stateCode:String):void {
+			forEachChar(stateCode, function(char:String) {
+				assertStateCharacter(char, state[char.toLowerCase()]);
+			});
 		}
 		
 		private function assertStateCharacter(codeLetter:String, val:Boolean):void {
 			Assert.assertEquals(toBoolean(codeLetter), val);
-		}
-		
-		/**
-		 * @return true if letter is uppercase, false if it is lowercase.
-		 * @throws Error if lettter is not case sensitive
-		 */
-		private function toBoolean(letter:String):Boolean {
-			if (isUppercase(letter))
-				return true;
-			else if (isLowercase(letter))
-				return false;
-			else
-				throw new Error("letter is not case sensitive. letter: " + letter);
-		}
-		
-		private function isUppercase(string:String):Boolean {
-			return string == string.toUpperCase();
-		}
-		
-		private function isLowercase(string:String):Boolean {
-			return string == string.toLowerCase();
 		}
 	}
 }

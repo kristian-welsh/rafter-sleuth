@@ -143,7 +143,7 @@ package src {
 		
 		private function pane11():void {
 			textBox.displayTextPane(12)
-			_tutorialProgress = 13;
+			_tutorialProgress = 12;
 			textBox.hide();
 			
 			player.canMove = true;
