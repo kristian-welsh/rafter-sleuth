@@ -6,6 +6,7 @@ package src {
 	import lib.*;
 	import src.keyboard.*;
 	import src.level.*;
+	import src.missions.*;
 	import src.player.*;
 	import src.textbox.*;
 	import src.ui.*;
@@ -13,6 +14,7 @@ package src {
 	// BUG: if you use the map before the mission giver gets to the stand, the mission giver never shows up
 	// BUG: you need to click the screen again after using the map to be able to control your character again
 	// BUG: if you use the map in mid-air you fall out of the level
+	// BUG: some of the collission detection is a bit off, further invetiction needed.
 	public class Main extends Sprite implements KeyboardResponder {
 		static private const IMPULSE_SIZE:Number = 20;
 		static private const ATTACK_RADIUS:int = 175;
@@ -35,7 +37,6 @@ package src {
 		public function Main(userInterfaceGraphics:MovieClip, playerView:MovieClip, levelView:MovieClip, textDisplay:MovieClip, restartGameFunction:Function):void {
 			this.restartGameFunction = restartGameFunction;
 			textBox = new TextBox(textDisplay);
-			keys = new KeyboardControls(this);
 			soundManager = new SoundManager();
 			userInterface = new UserInterfaceManager(new UserInterfaceView(userInterfaceGraphics));
 			player = new PlayerManager(playerView);
@@ -43,6 +44,7 @@ package src {
 			collider = new Collider(player, level);
 			clockManager = new ClockManager(userInterface, textBox, player);
 			missionManager = new MissionManager(textBox, player, level, userInterface, gameWin);
+			keys = new KeyboardControls(this, missionManager);
 			super();
 		}
 		
@@ -59,12 +61,12 @@ package src {
 		}
 		
 		public function jump():void {
-			if (!player.shouldJump())
-				return;
-			player.jump();
-			if (missionManager.tutorialProgress == 3) {
-				missionManager.canAdvanceText = true;
-				checkForText();
+			if (player.shouldJump()) {
+				player.jump();
+				if (missionManager.tutorialProgress == 3) {
+					missionManager.canAdvanceText = true;
+					missionManager.checkForText();
+				}
 			}
 		}
 		
@@ -108,7 +110,7 @@ package src {
 				if (keys.leftKeyDown || keys.rightKeyDown) {
 					if (missionManager.tutorialProgress == 2) {
 						missionManager.canAdvanceText = true;
-						checkForText();
+						missionManager.checkForText();
 					}
 				}
 			}
@@ -194,13 +196,9 @@ package src {
 				}
 				if (missionManager.tutorialProgress == 4) {
 					missionManager.canAdvanceText = true;
-					checkForText();
+					missionManager.checkForText();
 				}
 			}
-		}
-		
-		public function checkForText():void {
-			missionManager.checkForText();
 		}
 		
 		public function gameWin(MouseEvent):void {

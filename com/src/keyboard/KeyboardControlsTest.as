@@ -2,11 +2,13 @@ package src.keyboard {
 	import asunit.framework.TestCase;
 	import flash.events.EventDispatcher;
 	import flash.events.KeyboardEvent;
+	import src.missions.MissionManagerSpy;
 	
 	public class KeyboardControlsTest extends TestCase {
 		private var responder:KeyboardResponderSpy;
 		private var controls:KeyboardControls;
 		private var dispatcher:EventDispatcher;
+		private var missionManager:MissionManagerSpy;
 		
 		public function KeyboardControlsTest(testMethod:String):void {
 			super(testMethod);
@@ -14,7 +16,8 @@ package src.keyboard {
 		
 		override protected function setUp():void {
 			responder = new KeyboardResponderSpy();
-			controls = new KeyboardControls(responder);
+			missionManager = new MissionManagerSpy();
+			controls = new KeyboardControls(responder, missionManager);
 			dispatcher = new EventDispatcher();
 			controls.startListening(dispatcher);
 		}
@@ -76,7 +79,7 @@ package src.keyboard {
 		
 		public function releasing_enter_calls_checkForText_on_responder():void {
 			releaseKey(Keycode.ENTER);
-			responder.getSpy().assertLogged(responder.checkForText);
+			missionManager.getSpy().assertLogged(missionManager.checkForText);
 		}
 		
 		public function releasing_m_calls_viewMap_on_responder():void {

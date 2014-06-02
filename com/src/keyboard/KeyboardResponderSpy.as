@@ -12,10 +12,6 @@ package src.keyboard {
 			_spy.log(jump);
 		}
 		
-		public function checkForText():void {
-			_spy.log(checkForText);
-		}
-		
 		public function viewMap():void {
 			_spy.log(viewMap);
 		}

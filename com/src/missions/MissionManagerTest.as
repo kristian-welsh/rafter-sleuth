@@ -1,9 +1,8 @@
-package src {
+package src.missions {
 	import asunit.framework.TestCase;
 	import flash.events.Event;
-	import lib.assert;
-	import lib.test.Spy;
 	import src.level.LevelManagerSpy;
+	import src.missions.text_panes.*;
 	import src.player.PlayerDataSpy;
 	import src.textbox.TextBoxSpy;
 	import src.ui.UIManagerFake;
@@ -15,7 +14,6 @@ package src {
 		private var level:LevelManagerSpy;
 		private var userInterface:UIManagerFake;
 		private var gameWin:Function = function(e:Event):void {
-		
 		};
 		
 		public function MissionManagerTest(testMethod:String):void {

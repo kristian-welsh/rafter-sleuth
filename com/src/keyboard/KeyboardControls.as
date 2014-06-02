@@ -1,14 +1,18 @@
 package src.keyboard {
 	import flash.events.*;
+	import src.missions.IMissionManager;
 	
 	public class KeyboardControls {
 		private var responder:KeyboardResponder;
+		private var missionManager:IMissionManager;
+		
 		private var _leftKeyDown:Boolean;
 		private var _rightKeyDown:Boolean;
 		private var _can_attack:Boolean = true;
 		
-		public function KeyboardControls(responder:KeyboardResponder) {
+		public function KeyboardControls(responder:KeyboardResponder, missionManager:IMissionManager) {
 			this.responder = responder;
+			this.missionManager = missionManager;
 		}
 		
 		public function startListening(dispatcher:IEventDispatcher):void {
@@ -39,7 +43,7 @@ package src.keyboard {
 				responder.jump();
 			}
 			if (event.keyCode == Keycode.ENTER) {
-				responder.checkForText();
+				missionManager.checkForText();
 			}
 			if (event.keyCode == Keycode.SHIFT) {
 				_can_attack = true;
