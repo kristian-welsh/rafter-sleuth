@@ -4,12 +4,12 @@ package src.test {
 	public class SuiteTextBox extends AssignedTestSuite {
 		public function SuiteTextBox() {
 			super(TextBoxTest);
-			test("visible_returns_whether_view_is_visible");
-			test("show_makes_view_visible");
-			test("hide_makes_view_invisible");
-			test("currentTextPane_returns_1");
-			test("get_box_does_not_throw_error");
-			test("displayTextPane_calls_gotoAndStop_on_view");
+			addTest("visible_returns_whether_view_is_visible");
+			addTest("show_makes_view_visible");
+			addTest("hide_makes_view_invisible");
+			addTest("currentTextPane_returns_1");
+			addTest("get_box_does_not_throw_error");
+			addTest("displayTextPane_calls_gotoAndStop_on_view");
 		}
 	}
 }
