@@ -1,16 +1,13 @@
 package src.missions.text_panes {
-	import src.missions.text_panes.TextPane;
+	import src.missions.MissionManager;
 	import src.textbox.TextBox;
-	
 
-	public class Pane16 implements TextPane {
-		private var textBox:TextBox;
-		
-		public function Pane16(textBox:TextBox) {
-			this.textBox = textBox;
+	public class Pane16 extends TextPane{
+		public function Pane16(textBox:TextBox, manager:MissionManager) {
+			super(textBox, manager)
 		}
-		
-		public function show():void {
+
+		override public function show():void {
 			textBox.displayTextPane(17);
 		}
 	}

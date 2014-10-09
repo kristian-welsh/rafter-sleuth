@@ -11,6 +11,7 @@ package src.test {
 			addSuite(new SuiteKeyboardControls());
 			addSuite(new SuiteMissionManager());
 			addSuite(new SuiteTextBox());
+			addSuite(new SuiteTextPane())
 		}
 
 		private function addSuite(assignedSuite:AssignedTestSuite):void {
