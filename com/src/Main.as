@@ -14,7 +14,6 @@ package src {
 	// BUG: if you use the map before the mission giver gets to the stand, the mission giver never shows up
 	// BUG: you need to click the screen again after using the map to be able to control your character again
 	// BUG: if you use the map in mid-air you fall out of the level
-	// BUG: some of the collission detection is a bit off, further invetiction needed.
 	public class Main extends Sprite implements KeyboardResponder {
 		static private const IMPULSE_SIZE:Number = 20;
 		static private const ATTACK_RADIUS:int = 175;

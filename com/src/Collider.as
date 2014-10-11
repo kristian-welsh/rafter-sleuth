@@ -1,36 +1,69 @@
 package src {
+	import flash.display.MovieClip;
 	import src.level.LevelManager;
+	import src.player.IPlayerColider;
 	import src.player.PlayerManager;
 	public class Collider {
-		static private const PLAYER_RADIUS:int = 45;
-		private var player:PlayerManager;
+		static public const PLAYER_RADIUS:int = 45;
+		private var player:IPlayerColider;
 		private var level:LevelManager;
-		
-		public function Collider(player:PlayerManager, level:LevelManager) {
+
+		// Vocabulary: h_plats means horizontal platforms
+		// player's 0,0 is in the middle at the bottom
+		// platform cube's 0,0 is at the top-left corner
+		public function Collider(player:IPlayerColider, level:LevelManager) {
 			this.level = level;
 			this.player = player;
 		}
-		
-		/// Warning: both a command and a query
+
 		public function collideV():void {
 			for (var i:uint = 0; i < level.view.h_plats.numChildren; i++) {
-				if (player.view.x - PLAYER_RADIUS < level.view.h_plats.getChildAt(i).x + level.view.h_plats.x + level.view.x + 100) {
-					if (player.view.x + PLAYER_RADIUS > level.view.h_plats.getChildAt(i).x + level.view.h_plats.x + level.view.x) {
-						if (player.view.y < level.view.h_plats.getChildAt(i).y + level.view.h_plats.y + level.view.y) {
-							if (player.view.y - player.jumpSpeed > level.view.h_plats.getChildAt(i).y + level.view.h_plats.y + level.view.y) {
-								level.view.y = player.view.y - level.view.h_plats.y - level.view.h_plats.getChildAt(i).y + 1;
-								player.grounded = true;
-								break;
-							}
-						}
-					}
+				if (collideVPlatform(i))
+					break
+			}
+			if (i == level.view.h_plats.numChildren)
+				player.fall();
+		}
+
+		/**
+		 * @return true if collision occured, otherwise false
+		 */
+		private function collideVPlatform(i:uint):Boolean {
+			const platform:MovieClip = level.view.h_plats.getChildAt(i)
+			const platformX:Number = platform.x + level.view.h_plats.x + level.view.x
+			const platformY:Number = platform.y + level.view.h_plats.y + level.view.y
+			const platformWidth:Number = 100
+
+			const playerX:Number = player.view.x
+			const playerY:Number = player.view.y
+
+			const playersLeftSide:Number = playerX - PLAYER_RADIUS
+			const playersRightSide:Number = playerX + PLAYER_RADIUS
+			const playersBottomSide:Number = playerY
+
+			const platformRightSide:Number = platformX + platformWidth
+			const platformLeftSide:Number = platformX
+			const platformTopSide:Number = platformY
+
+			const horizontalyAligned:Boolean = playersRightSide > platformLeftSide && playersLeftSide < platformRightSide
+			const abovePlatform:Boolean = platformTopSide > playersBottomSide
+			const willCollideNextFallTick:Boolean = platformTopSide < playersBottomSide - player.jumpSpeed
+
+			if (horizontalyAligned) {
+				if (abovePlatform && willCollideNextFallTick) {
+					// player.jumpSpeed needs to be negative (player is falling) for both to be true
+					resolveCollision(platform)
+					player.setGrounded(true)
+					return true
 				}
 			}
-			if (i == level.view.h_plats.numChildren) {
-				player.fall();
-			}
+			return false
 		}
-		
+
+		private function resolveCollision(platform:MovieClip):void {
+			level.view.y = player.view.y - level.view.h_plats.y - platform.y + 1;
+		}
+
 		/// Warning: both a command and a query
 		public function collideH():Boolean {
 			var returnValue:Boolean;

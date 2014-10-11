@@ -12,6 +12,7 @@ package src.test {
 			addSuite(new SuiteMissionManager());
 			addSuite(new SuiteTextBox());
 			addSuite(new SuiteTextPane())
+			addSuite(new SuiteCollider())
 		}
 
 		private function addSuite(assignedSuite:AssignedTestSuite):void {
