@@ -17,19 +17,28 @@ package src {
 		}
 
 		public function collideV():void {
+			var platform:MovieClip = null
+			var collisionDetected:Boolean = false
+
 			for (var i:uint = 0; i < level.view.h_plats.numChildren; i++) {
-				if (collideVPlatform(i))
-					break
+				platform = findPlatformAtIndex(i)
+				if (willLandOn(platform)) {
+					resolveCollision(platform)
+					collisionDetected = true
+				}
 			}
-			if (i == level.view.h_plats.numChildren)
+			if (!collisionDetected)
 				player.fall();
+		}
+
+		private function findPlatformAtIndex(i:uint):MovieClip {
+			return level.view.h_plats.getChildAt(i)
 		}
 
 		/**
 		 * @return true if collision occured, otherwise false
 		 */
-		private function collideVPlatform(i:uint):Boolean {
-			const platform:MovieClip = level.view.h_plats.getChildAt(i)
+		private function willLandOn(platform:MovieClip):Boolean {
 			const platformX:Number = platform.x + level.view.h_plats.x + level.view.x
 			const platformY:Number = platform.y + level.view.h_plats.y + level.view.y
 			const platformWidth:Number = 100
@@ -47,21 +56,16 @@ package src {
 
 			const horizontalyAligned:Boolean = playersRightSide > platformLeftSide && playersLeftSide < platformRightSide
 			const abovePlatform:Boolean = platformTopSide > playersBottomSide
-			const willCollideNextFallTick:Boolean = platformTopSide < playersBottomSide - player.jumpSpeed
+			const willLandNextFallTick:Boolean = platformTopSide < playersBottomSide - player.jumpSpeed
 
-			if (horizontalyAligned) {
-				if (abovePlatform && willCollideNextFallTick) {
-					// player.jumpSpeed needs to be negative (player is falling) for both to be true
-					resolveCollision(platform)
-					player.setGrounded(true)
-					return true
-				}
-			}
+			if (horizontalyAligned && abovePlatform && willLandNextFallTick)
+				return true
 			return false
 		}
 
 		private function resolveCollision(platform:MovieClip):void {
 			level.view.y = player.view.y - level.view.h_plats.y - platform.y + 1;
+			player.setGrounded(true)
 		}
 
 		/// Warning: both a command and a query

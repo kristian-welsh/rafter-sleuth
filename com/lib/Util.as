@@ -1,7 +1,9 @@
 package lib {
+	import flash.display.Bitmap;
 	import flash.display.DisplayObject;
+	import flash.display.MovieClip;
 	import flash.utils.describeType;
-	
+
 	public class Util {
 		/**
 		 * Finds the source name of callee (ie: called on some function foo it would return "foo")
@@ -18,7 +20,7 @@ package lib {
 					return method.@name;
 			throw new Error("Method name not found for object \"" + calleeOrigin + "\"");
 		}
-		
+
 		/**
 		 * Returns whether list contains itemToFind in one of it's indexes.
 		 * @param	list A formaly defined list (eg: Array, Vector).
@@ -31,13 +33,31 @@ package lib {
 					return true;
 			return false;
 		}
-		
+
 		/**
 		 * Removes a displayObject from it's parent via removeChild.
 		 */
 		static public function orphanDisplayObject(displayObject:DisplayObject):void {
 			if (displayObject.parent)
 				displayObject.parent.removeChild(displayObject);
+		}
+
+		/**
+		 * Warning: Works by adding children, may be unsuitable in some situations.
+		 */
+		static public function setMovieClipWidth(movieClip:MovieClip, width:Number):void {
+			movieClip.addChild(new Bitmap())
+			movieClip.addChild(new Bitmap())
+			movieClip.getChildAt(0).x = width
+		}
+
+		/**
+		 * Warning: Works by adding children, may be unsuitable in some situations.
+		 */
+		static public function setMovieClipHeight(movieClip:MovieClip, height:Number):void {
+			movieClip.addChild(new Bitmap())
+			movieClip.addChild(new Bitmap())
+			movieClip.getChildAt(0).y = height
 		}
 	}
 }

@@ -1,21 +1,21 @@
 package src {
 	import asunit.framework.TestCase;
-	import flash.display.Bitmap;
 	import flash.display.MovieClip;
-	import flash.display.Sprite;
+	import lib.Util;
 	import src.Collider;
 	import src.level.FakeLevelView;
 	import src.level.LevelManager;
-	import src.level.LevelManagerSpy;
 	import src.player.PlayerColiderSpy;
-	import src.player.PlayerDataSpy;
 
 	public class ColliderTest extends TestCase {
 		private var player:PlayerColiderSpy;
 		private var levelView:FakeLevelView;
 		private var level:LevelManager;
 		private var collider:Collider;
+		private const platformWidth:Number = 100
 
+		// scrape means they fall with the entities sides touching (eg player right side == platform left side)
+		// a happy case and sad case for each boolean condition
 		public function ColliderTest(testMethod:String = null):void {
 			super(testMethod);
 		}
@@ -25,11 +25,6 @@ package src {
 			levelView = new FakeLevelView()
 			level = new LevelManager(levelView)
 			collider = new Collider(player, level);
-		}
-
-		private function makeLevel():LevelManager {
-			var view:FakeLevelView = new FakeLevelView()
-			return new LevelManager(view)
 		}
 
 		public function collideV_no_platforms():void {
@@ -44,32 +39,98 @@ package src {
 			assertCollision()
 		}
 
+		public function collideV_miss_too_far_left():void {
+			addObstacleAboutToPassPlayersRightSide()
+			collider.collideV()
+			assertNoCollision()
+		}
+
+		public function collideV_scrape_too_far_left():void {
+			addObstacleAboutToScrapePlayersRightSide()
+			collider.collideV()
+			assertNoCollision()
+		}
+
+		public function collideV_miss_too_far_right():void {
+			addObstacleAboutToPassPlayersLeftSide()
+			collider.collideV()
+			assertNoCollision()
+		}
+
+		public function collideV_scrape_too_far_right():void {
+			addObstacleAboutToScrapePlayersLeftSide()
+			collider.collideV()
+			assertNoCollision()
+		}
+
+		public function collideV_player_too_far_away_verticaly():void {
+			addObstacleFarBelowPlayer()
+			collider.collideV()
+			assertNoCollision()
+		}
+
+		public function collideV_platform_just_above_player():void {
+			addObstacleJustAbovePlayer()
+			collider.collideV()
+			assertNoCollision()
+		}
+
+		private function addObstacleAboutToScrapePlayersLeftSide():void {
+			createCatchingPlatformAtX(-Collider.PLAYER_RADIUS - platformWidth)
+		}
+
+		private function addObstacleAboutToPassPlayersLeftSide():void {
+			createCatchingPlatformAtX(-Collider.PLAYER_RADIUS - platformWidth - 1)
+		}
+
+		private function addObstacleAboutToPassPlayersRightSide():void {
+			createCatchingPlatformAtX(Collider.PLAYER_RADIUS + 1)
+		}
+
+		private function addObstacleAboutToScrapePlayersRightSide():void {
+			createCatchingPlatformAtX(Collider.PLAYER_RADIUS)
+		}
+
 		private function addObstacleAboutToTouchPlayer():void {
-			var obstacle:MovieClip = createStandardSizeObstacle()
-			obstacle.x = -Collider.PLAYER_RADIUS - obstacle.width + 1
-			obstacle.y = -player.jumpSpeed - 1
-			levelView.h_plats.addChild(obstacle)
+			createCatchingPlatformAtX(-Collider.PLAYER_RADIUS - platformWidth + 5)
+		}
+
+		private function createCatchingPlatformAtX(x:Number):void {
+			addPlatformAt(x, justUnderPlayer())
+		}
+
+		private function addObstacleFarBelowPlayer():void {
+			const xThatWouldCatchPlayer:Number = -Collider.PLAYER_RADIUS - platformWidth + 5
+			const yThatWouldNotCatchPlayer:Number = -player.jumpSpeed * 5
+			addPlatformAt(xThatWouldCatchPlayer, yThatWouldNotCatchPlayer)
+		}
+
+		private function addObstacleJustAbovePlayer():void {
+			const xThatWouldCatchPlayer:Number = -Collider.PLAYER_RADIUS - platformWidth + 5
+			const yThatWouldNotCatchPlayer:Number = player.view.y - 1
+			addPlatformAt(xThatWouldCatchPlayer, yThatWouldNotCatchPlayer)
+		}
+
+		private function addPlatformAt(x:Number, y:Number):void {
+			var platform:MovieClip = createStandardSizeObstacle()
+			setCollisionPlatform(platform)
+			platform.y = y
+			platform.x = x
 		}
 
 		private function createStandardSizeObstacle():MovieClip {
 			var obstacle:MovieClip = new MovieClip()
-			setMovieClipWidth(obstacle, 100)
-			setMovieClipHeight(obstacle, 100)
+			Util.setMovieClipWidth(obstacle, platformWidth)
+			Util.setMovieClipHeight(obstacle, 100)
 			return obstacle
 		}
 
-		// You cannot set DisplayObject::width directly so use this workaround instead.
-		private function setMovieClipWidth(movieClip:MovieClip, width:Number):void {
-			movieClip.addChild(new Bitmap())
-			movieClip.addChild(new Bitmap())
-			movieClip.getChildAt(0).x = width
+		private function setCollisionPlatform(platform:MovieClip):void {
+			levelView.h_plats.addChild(platform)
 		}
 
-		// You cannot set DisplayObject::height directly so use this workaround instead.
-		private function setMovieClipHeight(movieClip:MovieClip, height:Number):void {
-			movieClip.addChild(new Bitmap())
-			movieClip.addChild(new Bitmap())
-			movieClip.getChildAt(0).y = height
+		private function justUnderPlayer():Number {
+			return -player.jumpSpeed - 1
 		}
 
 		private function assertCollision():void {
