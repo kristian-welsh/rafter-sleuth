@@ -3,7 +3,7 @@ package src.level {
 
 
 	public class FakeLevelView extends MovieClip {
-		public var h_plats:MovieClip = new MovieClip()
+		public var horizontalPlatforms:MovieClip = new MovieClip()
 		public var edge_plats:MovieClip = new MovieClip()
 	}
 }

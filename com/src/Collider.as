@@ -1,71 +1,122 @@
 package src {
 	import flash.display.MovieClip;
+	import flash.geom.Point;
+	import flash.geom.Rectangle;
 	import src.level.LevelManager;
 	import src.player.IPlayerColider;
 	import src.player.PlayerManager;
 	public class Collider {
 		static public const PLAYER_RADIUS:int = 45;
+		static public const PLAYER_WIDTH:int = PLAYER_RADIUS * 2;
+		static public const PLATFORM_WIDTH:Number = 100
 		private var player:IPlayerColider;
 		private var level:LevelManager;
+		private var playerLanding:Boolean
 
-		// Vocabulary: h_plats means horizontal platforms
+		// Assumptions:
 		// player's 0,0 is in the middle at the bottom
-		// platform cube's 0,0 is at the top-left corner
 		public function Collider(player:IPlayerColider, level:LevelManager) {
 			this.level = level;
 			this.player = player;
 		}
 
-		public function collideV():void {
-			var platform:MovieClip = null
-			var collisionDetected:Boolean = false
-
-			for (var i:uint = 0; i < level.view.h_plats.numChildren; i++) {
-				platform = findPlatformAtIndex(i)
-				if (willLandOn(platform)) {
-					resolveCollision(platform)
-					collisionDetected = true
-				}
-			}
-			if (!collisionDetected)
-				player.fall();
-		}
-
-		private function findPlatformAtIndex(i:uint):MovieClip {
-			return level.view.h_plats.getChildAt(i)
-		}
-
 		/**
-		 * @return true if collision occured, otherwise false
+		 * If the player's going to pass a platform on the next fall tick
+		 * place the player on that platform and stop his fall.
 		 */
-		private function willLandOn(platform:MovieClip):Boolean {
-			const platformX:Number = platform.x + level.view.h_plats.x + level.view.x
-			const platformY:Number = platform.y + level.view.h_plats.y + level.view.y
-			const platformWidth:Number = 100
-
-			const playerX:Number = player.view.x
-			const playerY:Number = player.view.y
-
-			const playersLeftSide:Number = playerX - PLAYER_RADIUS
-			const playersRightSide:Number = playerX + PLAYER_RADIUS
-			const playersBottomSide:Number = playerY
-
-			const platformRightSide:Number = platformX + platformWidth
-			const platformLeftSide:Number = platformX
-			const platformTopSide:Number = platformY
-
-			const horizontalyAligned:Boolean = playersRightSide > platformLeftSide && playersLeftSide < platformRightSide
-			const abovePlatform:Boolean = platformTopSide > playersBottomSide
-			const willLandNextFallTick:Boolean = platformTopSide < playersBottomSide - player.jumpSpeed
-
-			if (horizontalyAligned && abovePlatform && willLandNextFallTick)
-				return true
-			return false
+		public function collideV():void {
+			playerLanding = false
+			tryLandingEachPlatform()
+			fallIfNotLanding()
 		}
 
-		private function resolveCollision(platform:MovieClip):void {
-			level.view.y = player.view.y - level.view.h_plats.y - platform.y + 1;
+		private function tryLandingEachPlatform():void {
+			for (var i:uint = 0; i < numPlatforms(); i++)
+				if (canLandAt(i))
+					landAt(i)
+		}
+
+		private function numPlatforms():uint {
+			return level.view.horizontalPlatforms.numChildren
+		}
+
+		private function canLandAt(platformIndex:uint):Boolean {
+			return wouldFallThrough(playerHitbox(), platformHitboxAt(platformIndex))
+		}
+
+		private function wouldFallThrough(player:Rectangle, platform:Rectangle):Boolean {
+			return horizontalyAligned(player, platform) && abovePlatform(player, platform) && willLandNextFallTick(player, platform)
+		}
+
+		private function horizontalyAligned(player:Rectangle, platform:Rectangle):Boolean {
+			return player.right > platform.left && player.left < platform.right
+		}
+
+		private function abovePlatform(player:Rectangle, platform:Rectangle):Boolean {
+			return platform.top > player.bottom
+		}
+
+		private function willLandNextFallTick(player:Rectangle, platform:Rectangle):Boolean {
+			return platform.top < player.bottom - playerJumpSpeed()
+		}
+
+		private function playerHitbox():Rectangle {
+			return new Rectangle(playerX() - PLAYER_WIDTH / 2, playerY(), PLAYER_WIDTH, 0)
+		}
+
+		private function playerX():Number {
+			return player.view.x
+		}
+
+		private function playerY():Number {
+			return player.view.y
+		}
+
+		private function platformHitboxAt(platformIndex:uint):Rectangle {
+			return platformHitbox(platformAt(platformIndex))
+		}
+
+		private function platformAt(i:uint):MovieClip {
+			return level.view.horizontalPlatforms.getChildAt(i)
+		}
+
+		private function platformHitbox(platform:MovieClip):Rectangle {
+			return new Rectangle(platformX(platform), platformY(platform), PLATFORM_WIDTH, PLATFORM_WIDTH)
+		}
+
+		private function platformX(platform:MovieClip):Number {
+			return platformGlobalPos(platform).x
+		}
+
+		private function platformY(platform:MovieClip):Number {
+			return platformGlobalPos(platform).y
+		}
+
+		private function platformGlobalPos(platform:MovieClip):Point {
+			return platform.localToGlobal(new Point(0, 0))
+		}
+
+		private function playerJumpSpeed():Number {
+			return player.jumpSpeed
+		}
+
+		private function landAt(i:uint):void {
+			landPlayer(platformAt(i))
+		}
+
+		private function landPlayer(platform:MovieClip):void {
+			positionPlayerAbove(platform)
 			player.setGrounded(true)
+			playerLanding = true
+		}
+
+		private function positionPlayerAbove(platform:MovieClip):void {
+			level.view.y = player.view.y - level.view.horizontalPlatforms.y - platform.y + 1;
+		}
+
+		private function fallIfNotLanding():void {
+			if (!playerLanding)
+				player.fall();
 		}
 
 		/// Warning: both a command and a query

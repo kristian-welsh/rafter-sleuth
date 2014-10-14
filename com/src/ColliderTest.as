@@ -1,6 +1,9 @@
 package src {
 	import asunit.framework.TestCase;
+	import flash.display.DisplayObject;
 	import flash.display.MovieClip;
+	import flash.display.Sprite;
+	import flash.geom.Rectangle;
 	import lib.Util;
 	import src.Collider;
 	import src.level.FakeLevelView;
@@ -33,65 +36,65 @@ package src {
 		}
 
 		public function collideV_platform_about_to_touch_player():void {
-			addObstacleAboutToTouchPlayer()
+			addPlatformAboutToTouchPlayer()
 			collider.collideV()
 			assertEquals(-8, levelView.y)
 			assertCollision()
 		}
 
 		public function collideV_miss_too_far_left():void {
-			addObstacleAboutToPassPlayersRightSide()
+			addPlatformAboutToPassPlayersRightSide()
 			collider.collideV()
 			assertNoCollision()
 		}
 
 		public function collideV_scrape_too_far_left():void {
-			addObstacleAboutToScrapePlayersRightSide()
+			addPlatformAboutToScrapePlayersRightSide()
 			collider.collideV()
 			assertNoCollision()
 		}
 
 		public function collideV_miss_too_far_right():void {
-			addObstacleAboutToPassPlayersLeftSide()
+			addPlatformAboutToPassPlayersLeftSide()
 			collider.collideV()
 			assertNoCollision()
 		}
 
 		public function collideV_scrape_too_far_right():void {
-			addObstacleAboutToScrapePlayersLeftSide()
+			addPlatformAboutToScrapePlayersLeftSide()
 			collider.collideV()
 			assertNoCollision()
 		}
 
 		public function collideV_player_too_far_away_verticaly():void {
-			addObstacleFarBelowPlayer()
+			addPlatformFarBelowPlayer()
 			collider.collideV()
 			assertNoCollision()
 		}
 
 		public function collideV_platform_just_above_player():void {
-			addObstacleJustAbovePlayer()
+			addPlatformJustAbovePlayer()
 			collider.collideV()
 			assertNoCollision()
 		}
 
-		private function addObstacleAboutToScrapePlayersLeftSide():void {
+		private function addPlatformAboutToScrapePlayersLeftSide():void {
 			createCatchingPlatformAtX(-Collider.PLAYER_RADIUS - platformWidth)
 		}
 
-		private function addObstacleAboutToPassPlayersLeftSide():void {
+		private function addPlatformAboutToPassPlayersLeftSide():void {
 			createCatchingPlatformAtX(-Collider.PLAYER_RADIUS - platformWidth - 1)
 		}
 
-		private function addObstacleAboutToPassPlayersRightSide():void {
+		private function addPlatformAboutToPassPlayersRightSide():void {
 			createCatchingPlatformAtX(Collider.PLAYER_RADIUS + 1)
 		}
 
-		private function addObstacleAboutToScrapePlayersRightSide():void {
+		private function addPlatformAboutToScrapePlayersRightSide():void {
 			createCatchingPlatformAtX(Collider.PLAYER_RADIUS)
 		}
 
-		private function addObstacleAboutToTouchPlayer():void {
+		private function addPlatformAboutToTouchPlayer():void {
 			createCatchingPlatformAtX(-Collider.PLAYER_RADIUS - platformWidth + 5)
 		}
 
@@ -99,26 +102,26 @@ package src {
 			addPlatformAt(x, justUnderPlayer())
 		}
 
-		private function addObstacleFarBelowPlayer():void {
+		private function addPlatformFarBelowPlayer():void {
 			const xThatWouldCatchPlayer:Number = -Collider.PLAYER_RADIUS - platformWidth + 5
 			const yThatWouldNotCatchPlayer:Number = -player.jumpSpeed * 5
 			addPlatformAt(xThatWouldCatchPlayer, yThatWouldNotCatchPlayer)
 		}
 
-		private function addObstacleJustAbovePlayer():void {
+		private function addPlatformJustAbovePlayer():void {
 			const xThatWouldCatchPlayer:Number = -Collider.PLAYER_RADIUS - platformWidth + 5
 			const yThatWouldNotCatchPlayer:Number = player.view.y - 1
 			addPlatformAt(xThatWouldCatchPlayer, yThatWouldNotCatchPlayer)
 		}
 
 		private function addPlatformAt(x:Number, y:Number):void {
-			var platform:MovieClip = createStandardSizeObstacle()
+			var platform:MovieClip = createStandardSizePlatform()
 			setCollisionPlatform(platform)
 			platform.y = y
 			platform.x = x
 		}
 
-		private function createStandardSizeObstacle():MovieClip {
+		private function createStandardSizePlatform():MovieClip {
 			var obstacle:MovieClip = new MovieClip()
 			Util.setMovieClipWidth(obstacle, platformWidth)
 			Util.setMovieClipHeight(obstacle, 100)
@@ -126,7 +129,7 @@ package src {
 		}
 
 		private function setCollisionPlatform(platform:MovieClip):void {
-			levelView.h_plats.addChild(platform)
+			levelView.horizontalPlatforms.addChild(platform)
 		}
 
 		private function justUnderPlayer():Number {

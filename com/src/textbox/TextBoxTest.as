@@ -12,7 +12,7 @@ package src.textbox {
 
 		override protected function setUp():void {
 			view = new MovieClipSpy();
-			textBox = new TextBox(view, function(){});
+			textBox = new TextBox(view, function():void{});
 		}
 
 		public function visible_returns_whether_view_is_visible():void {

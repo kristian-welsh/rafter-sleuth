@@ -11,9 +11,10 @@ package src {
 	import src.textbox.*;
 	import src.ui.*;
 
-	// BUG: if you use the map before the mission giver gets to the stand, the mission giver never shows up
-	// BUG: you need to click the screen again after using the map to be able to control your character again
-	// BUG: if you use the map in mid-air you fall out of the level
+	// ATTENTION: to compile Game.swf from flashdevelop press f6. To run tests, press f5.
+	// BUG: if you use the map before the mission giver gets to the stand, the mission giver never shows up.
+	// BUG: you need to click the screen again after using the map to be able to control your character again.
+	// BUG: if you use the map in mid-air you fall out of the level.
 	public class Main extends Sprite implements KeyboardResponder {
 		static private const IMPULSE_SIZE:Number = 20;
 		static private const ATTACK_RADIUS:int = 175;
