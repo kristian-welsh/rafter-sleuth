@@ -4,14 +4,15 @@ package src.test {
 	import lib.test.SuiteProvider;
 	import src.ColliderTest;
 	import src.keyboard.KeyboardControlsTest;
+	import src.missions.MissionManagerTest;
 	import src.ui.UserInterfaceManagerTest;
 
 	public class AllTests extends TestSuite {
 		public function AllTests() {
-			addTests(new UserInterfaceManagerTest());
-			addTests(new KeyboardControlsTest());
-			addSuite(new SuiteMissionManager());
-			addSuite(new SuiteTextBox());
+			addTests(new UserInterfaceManagerTest())
+			addTests(new KeyboardControlsTest())
+			addTests(new MissionManagerTest())
+			addSuite(new SuiteTextBox())
 			addSuite(new SuiteTextPane())
 			addTests(new ColliderTest())
 		}

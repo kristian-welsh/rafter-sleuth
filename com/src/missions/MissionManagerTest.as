@@ -1,23 +1,40 @@
 package src.missions {
 	import asunit.framework.TestCase;
-	import flash.display.MovieClip;
-	import flash.events.Event;
+	import asunit.framework.TestSuite;
+	import lib.ReflectionTestSuiteBuilder;
+	import lib.test.SuiteProvider;
 	import src.level.LevelManagerSpy;
 	import src.missions.text_panes.*;
 	import src.player.PlayerDataSpy;
 	import src.textbox.FakeTextBox;
 	import src.textbox.TextBox;
-	import src.textbox.TextBoxSpy;
 	import src.ui.UIManagerFake;
 
-	public class MissionManagerTest extends TestCase {
+	public class MissionManagerTest extends TestCase implements SuiteProvider {
 		private var textBox:TextBox;
 		private var missionManager:MissionManager;
 		private var player:PlayerDataSpy;
 		private var level:LevelManagerSpy;
 		private var userInterface:UIManagerFake;
 
-		public function MissionManagerTest(testMethod:String):void {
+		public function getSuite():TestSuite {
+			var testSuite:ReflectionTestSuiteBuilder = new ReflectionTestSuiteBuilder(this)
+			testSuite.addTest(testPane1);
+			testSuite.addTest(testPane2);
+			testSuite.addTest(testPane3);
+			testSuite.addTest(testPane4);
+			testSuite.addTest(testTutorialPane);
+			testSuite.addTest(testPane11);
+			testSuite.addTest(testPane12);
+			testSuite.addTest(testPane13);
+			testSuite.addTest(testPane14);
+			testSuite.addTest(testPane15);
+			testSuite.addTest(testPane16);
+			testSuite.addTest(testPane17);
+			return testSuite.getSuite()
+		}
+
+		public function MissionManagerTest(testMethod:String = null):void {
 			super(testMethod);
 		}
 
