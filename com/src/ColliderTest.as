@@ -1,21 +1,35 @@
 package src {
 	import asunit.framework.TestCase;
-	import flash.display.DisplayObject;
+	import asunit.framework.TestSuite;
 	import flash.display.MovieClip;
-	import flash.display.Sprite;
-	import flash.geom.Rectangle;
+	import lib.ReflectionTestSuiteBuilder;
+	import lib.test.AssignedTestSuite;
+	import lib.test.SuiteProvider;
 	import lib.Util;
 	import src.Collider;
 	import src.level.FakeLevelView;
 	import src.level.LevelManager;
 	import src.player.PlayerColiderSpy;
 
-	public class ColliderTest extends TestCase {
+	public class ColliderTest extends TestCase implements SuiteProvider {
 		private var player:PlayerColiderSpy;
 		private var levelView:FakeLevelView;
 		private var level:LevelManager;
 		private var collider:Collider;
 		private const platformWidth:Number = 100
+
+		public function getSuite():TestSuite {
+			var testSuite:ReflectionTestSuiteBuilder = new ReflectionTestSuiteBuilder(this)
+			testSuite.addTest(collideV_no_platforms)
+			testSuite.addTest(collideV_platform_about_to_touch_player)
+			testSuite.addTest(collideV_miss_too_far_left)
+			testSuite.addTest(collideV_scrape_too_far_left)
+			testSuite.addTest(collideV_miss_too_far_right)
+			testSuite.addTest(collideV_scrape_too_far_right)
+			testSuite.addTest(collideV_player_too_far_away_verticaly)
+			testSuite.addTest(collideV_platform_just_above_player)
+			return testSuite.getSuite()
+		}
 
 		// scrape means they fall with the entities sides touching (eg player right side == platform left side)
 		// a happy case and sad case for each boolean condition

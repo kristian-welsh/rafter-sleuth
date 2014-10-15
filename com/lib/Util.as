@@ -3,6 +3,9 @@ package lib {
 	import flash.display.DisplayObject;
 	import flash.display.MovieClip;
 	import flash.utils.describeType;
+	import flash.utils.getDefinitionByName;
+	import flash.utils.getQualifiedClassName;
+	import org.flashdevelop.utils.FlashConnect;
 
 	public class Util {
 		/**
@@ -10,7 +13,7 @@ package lib {
 		 * This only works for public instance functions.
 		 * WARNING: REFLECTION
 		 * @param	callee The public instance function you want to find the name of.
-		 * @param	calleeOrigin The object (not class) that the function is defined on.
+		 * @param	calleeOrigin The specific instance (not class) that the function was taken from.
 		 * @return	The name of callee.
 		 * @throws	An Error with message "Method name not found for object "calleeOrigin"" if callee is not a public instance function on calleObject.
 		 */
@@ -18,7 +21,18 @@ package lib {
 			for each (var method:XML in describeType(calleeOrigin)..method)
 				if (calleeOrigin[method.@name] == callee)
 					return method.@name;
-			throw new Error("Method name not found for object \"" + calleeOrigin + "\"");
+			throw new Error("Method name not found for object \"" + calleeOrigin + "\". Either the function is not defined, or you gave us the wrong instance");
+		}
+
+		/**
+		 * Finds which class the object you passed in is an instance of.
+		 * @param	instance An instance of the class you want to find.
+		 * @return	Class of the object passed in
+		 */
+		static public function getClassOf(instance:Object):Class {
+			var fullyQualifiedClassName:String = getQualifiedClassName(instance)
+			var classHierarchyDefinition:Object = getDefinitionByName(fullyQualifiedClassName)
+			return classHierarchyDefinition as Class
 		}
 
 		/**

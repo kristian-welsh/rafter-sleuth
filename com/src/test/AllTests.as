@@ -1,22 +1,27 @@
 package src.test {
 	import asunit.framework.TestSuite;
 	import lib.test.AssignedTestSuite;
+	import lib.test.SuiteProvider;
+	import src.ColliderTest;
 	import src.keyboard.KeyboardControlsTest;
-	import src.missions.MissionManagerTest;
 	import src.ui.UserInterfaceManagerTest;
 
 	public class AllTests extends TestSuite {
 		public function AllTests() {
-			addSuite(new SuiteUserInterfaceManager());
-			addSuite(new SuiteKeyboardControls());
+			addTests(new UserInterfaceManagerTest());
+			addTests(new KeyboardControlsTest());
 			addSuite(new SuiteMissionManager());
 			addSuite(new SuiteTextBox());
 			addSuite(new SuiteTextPane())
-			addSuite(new SuiteCollider())
+			addTests(new ColliderTest())
 		}
 
 		private function addSuite(assignedSuite:AssignedTestSuite):void {
 			addTest(assignedSuite.getSuite());
+		}
+
+		private function addTests(tests:SuiteProvider):void {
+			addTest(tests.getSuite());
 		}
 	}
 }
