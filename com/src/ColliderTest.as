@@ -3,7 +3,6 @@ package src {
 	import asunit.framework.TestSuite;
 	import flash.display.MovieClip;
 	import lib.ReflectionTestSuiteBuilder;
-	import lib.test.AssignedTestSuite;
 	import lib.test.SuiteProvider;
 	import lib.Util;
 	import src.Collider;
