@@ -5,6 +5,7 @@ package src.test {
 	import src.ColliderTest;
 	import src.keyboard.KeyboardControlsTest;
 	import src.missions.MissionManagerTest;
+	import src.textbox.TextBoxTest;
 	import src.ui.UserInterfaceManagerTest;
 
 	public class AllTests extends TestSuite {
@@ -12,7 +13,7 @@ package src.test {
 			addTests(new UserInterfaceManagerTest())
 			addTests(new KeyboardControlsTest())
 			addTests(new MissionManagerTest())
-			addSuite(new SuiteTextBox())
+			addTests(new TextBoxTest())
 			addSuite(new SuiteTextPane())
 			addTests(new ColliderTest())
 		}

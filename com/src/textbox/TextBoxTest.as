@@ -1,10 +1,24 @@
 package src.textbox {
 	import asunit.framework.TestCase;
+	import asunit.framework.TestSuite;
+	import lib.ReflectionTestSuiteBuilder;
+	import lib.test.SuiteProvider;
 	import src.test.MovieClipSpy;
 
-	public class TextBoxTest extends TestCase {
+	public class TextBoxTest extends TestCase implements SuiteProvider {
 		private var view:MovieClipSpy;
 		private var textBox:TextBox;
+
+		public function getSuite():TestSuite {
+			var testSuite:ReflectionTestSuiteBuilder = new ReflectionTestSuiteBuilder(this)
+			testSuite.addTest(visible_returns_whether_view_is_visible);
+			testSuite.addTest(show_makes_view_visible);
+			testSuite.addTest(hide_makes_view_invisible);
+			testSuite.addTest(currentTextPane_returns_1);
+			testSuite.addTest(get_box_does_not_throw_error);
+			testSuite.addTest(displayTextPane_calls_gotoAndStop_on_view);
+			return testSuite.getSuite()
+		}
 
 		public function TextBoxTest(methodName:String = null) {
 			super(methodName);
@@ -12,7 +26,8 @@ package src.textbox {
 
 		override protected function setUp():void {
 			view = new MovieClipSpy();
-			textBox = new TextBox(view, function():void{});
+			textBox = new TextBox(view, function():void {
+				});
 		}
 
 		public function visible_returns_whether_view_is_visible():void {
