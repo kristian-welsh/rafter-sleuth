@@ -11,12 +11,13 @@ package src.textbox {
 
 		public function getSuite():TestSuite {
 			var testSuite:ReflectionTestSuiteBuilder = new ReflectionTestSuiteBuilder(this)
-			testSuite.addTest(visible_returns_whether_view_is_visible);
-			testSuite.addTest(show_makes_view_visible);
-			testSuite.addTest(hide_makes_view_invisible);
-			testSuite.addTest(currentTextPane_returns_1);
-			testSuite.addTest(get_box_does_not_throw_error);
-			testSuite.addTest(displayTextPane_calls_gotoAndStop_on_view);
+			testSuite.addTests([
+				visible_returns_whether_view_is_visible,
+				show_makes_view_visible,
+				hide_makes_view_invisible,
+				currentTextPane_returns_1,
+				get_box_does_not_throw_error,
+				displayTextPane_calls_gotoAndStop_on_view]);
 			return testSuite.getSuite()
 		}
 

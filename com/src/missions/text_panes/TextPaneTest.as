@@ -11,7 +11,7 @@ package src.missions.text_panes {
 
 		public function getSuite():TestSuite {
 			var testSuite:ReflectionTestSuiteBuilder = new ReflectionTestSuiteBuilder(this)
-			testSuite.addTest(throws_correct_error_on_show)
+			testSuite.addTests([throws_correct_error_on_show])
 			return testSuite.getSuite()
 		}
 

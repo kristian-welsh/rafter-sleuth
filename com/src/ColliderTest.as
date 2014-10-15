@@ -19,14 +19,15 @@ package src {
 
 		public function getSuite():TestSuite {
 			var testSuite:ReflectionTestSuiteBuilder = new ReflectionTestSuiteBuilder(this)
-			testSuite.addTest(collideV_no_platforms)
-			testSuite.addTest(collideV_platform_about_to_touch_player)
-			testSuite.addTest(collideV_miss_too_far_left)
-			testSuite.addTest(collideV_scrape_too_far_left)
-			testSuite.addTest(collideV_miss_too_far_right)
-			testSuite.addTest(collideV_scrape_too_far_right)
-			testSuite.addTest(collideV_player_too_far_away_verticaly)
-			testSuite.addTest(collideV_platform_just_above_player)
+			testSuite.addTests([
+				collideV_no_platforms,
+				collideV_platform_about_to_touch_player,
+				collideV_miss_too_far_left,
+				collideV_scrape_too_far_left,
+				collideV_miss_too_far_right,
+				collideV_scrape_too_far_right,
+				collideV_player_too_far_away_verticaly,
+				collideV_platform_just_above_player])
 			return testSuite.getSuite()
 		}
 

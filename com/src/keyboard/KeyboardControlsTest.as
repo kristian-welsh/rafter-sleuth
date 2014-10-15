@@ -15,18 +15,19 @@ package src.keyboard {
 
 		public function getSuite():TestSuite {
 			var testSuite:ReflectionTestSuiteBuilder = new ReflectionTestSuiteBuilder(this)
-			testSuite.addTest(initial_values_are_correct);
-			testSuite.addTest(can_set_the_can_attack_variable);
-			testSuite.addTest(pressing_left_arrow_makes_leftKeyDown_true);
-			testSuite.addTest(pressing_right_arrow_makes_rightKeyDown_true);
-			testSuite.addTest(pressing_then_releasing_left_arrow_makes_leftKeyDown_false);
-			testSuite.addTest(pressing_then_releasing_right_arrow_makes_rightKeyDown_false);
-			testSuite.addTest(pressing_shift_calls_attack_on_responder);
-			testSuite.addTest(releasing_shift_makes_canAttack_true);
-			testSuite.addTest(releasing_space_calls_jump_on_responder);
-			testSuite.addTest(releasing_enter_calls_checkForText_on_responder);
-			testSuite.addTest(releasing_m_calls_viewMap_on_responder);
-			testSuite.addTest(pressing_or_releasing_any_other_key_does_nothing);
+			testSuite.addTests([
+				initial_values_are_correct,
+				can_set_the_can_attack_variable,
+				pressing_left_arrow_makes_leftKeyDown_true,
+				pressing_right_arrow_makes_rightKeyDown_true,
+				pressing_then_releasing_left_arrow_makes_leftKeyDown_false,
+				pressing_then_releasing_right_arrow_makes_rightKeyDown_false,
+				pressing_shift_calls_attack_on_responder,
+				releasing_shift_makes_canAttack_true,
+				releasing_space_calls_jump_on_responder,
+				releasing_enter_calls_checkForText_on_responder,
+				releasing_m_calls_viewMap_on_responder,
+				pressing_or_releasing_any_other_key_does_nothing]);
 			return testSuite.getSuite()
 		}
 

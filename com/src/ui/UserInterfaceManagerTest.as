@@ -10,21 +10,22 @@ package src.ui {
 
 		public function getSuite():TestSuite {
 			var suite:ReflectionTestSuiteBuilder = new ReflectionTestSuiteBuilder(this)
-			suite.addTest(initialize);
-			suite.addTest(startMission);
-			suite.addTest(reset);
-			suite.addTest(showQuestIcon);
-			suite.addTest(hideQuestIcon);
-			suite.addTest(isQuestIconVisible);
-			suite.addTest(showInterface);
-			suite.addTest(hideInterface);
-			suite.addTest(showItemIcon);
-			suite.addTest(hideItemIcon);
-			suite.addTest(tickSecondHand);
-			suite.addTest(tickMinuteHand);
-			suite.addTest(clockFinished);
-			suite.addTest(increaseScore);
-			suite.addTest(increaseLives);
+			suite.addTests([
+				initialize,
+				startMission,
+				reset,
+				showQuestIcon,
+				hideQuestIcon,
+				isQuestIconVisible,
+				showInterface,
+				hideInterface,
+				showItemIcon,
+				hideItemIcon,
+				tickSecondHand,
+				tickMinuteHand,
+				clockFinished,
+				increaseScore,
+				increaseLives]);
 			return suite.getSuite()
 		}
 

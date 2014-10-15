@@ -19,18 +19,19 @@ package src.missions {
 
 		public function getSuite():TestSuite {
 			var testSuite:ReflectionTestSuiteBuilder = new ReflectionTestSuiteBuilder(this)
-			testSuite.addTest(testPane1);
-			testSuite.addTest(testPane2);
-			testSuite.addTest(testPane3);
-			testSuite.addTest(testPane4);
-			testSuite.addTest(testTutorialPane);
-			testSuite.addTest(testPane11);
-			testSuite.addTest(testPane12);
-			testSuite.addTest(testPane13);
-			testSuite.addTest(testPane14);
-			testSuite.addTest(testPane15);
-			testSuite.addTest(testPane16);
-			testSuite.addTest(testPane17);
+			testSuite.addTests([
+				testPane1,
+				testPane2,
+				testPane3,
+				testPane4,
+				testTutorialPane,
+				testPane11,
+				testPane12,
+				testPane13,
+				testPane14,
+				testPane15,
+				testPane16,
+				testPane17]);
 			return testSuite.getSuite()
 		}
 
