@@ -26,7 +26,8 @@ package src {
 		private var player:PlayerManager;
 		private var level:LevelManager;
 		private var userInterface:UserInterfaceManager;
-		private var collider:Collider;
+		private var verticalCollider:VerticalCollider;
+		private var horizontalCollider:HorizontalCollider;
 		private var soundManager:SoundManager;
 		private var clockManager:ClockManager
 		private var missionManager:MissionManager;
@@ -46,7 +47,8 @@ package src {
 			userInterface = new UserInterfaceManager(new UserInterfaceView(userInterfaceGraphics));
 			player = new PlayerManager(playerView);
 			level = new LevelManager(levelView);
-			collider = new Collider(player, level);
+			verticalCollider = new VerticalCollider(player, level);
+			horizontalCollider = new HorizontalCollider(player, level);
 			clockManager = new ClockManager(userInterface, textBox, player);
 			missionManager = new MissionManager(textBox, player, level, userInterface);
 
@@ -77,7 +79,7 @@ package src {
 			player.updateInvincibility();
 			moveLeftAndRight();
 			fall();
-			collider.collideV()
+			verticalCollider.collide()
 			collideStamps();
 			collideTea();
 			if (!player.invincible)
@@ -94,7 +96,7 @@ package src {
 				return;
 			if (player.canMove) {
 				if (keys.leftKeyDown && !keys.rightKeyDown) {
-					if (!collider.collideH()) {
+					if (!horizontalCollider.collideH()) {
 						if (player.grounded)
 							player.displayWalkLeft();
 						level.view.x += player.walkSpeed;
@@ -102,7 +104,7 @@ package src {
 					player.setLastDireciton("left");
 				}
 				if (!keys.leftKeyDown && keys.rightKeyDown) {
-					if (!collider.collideH()) {
+					if (!horizontalCollider.collideH()) {
 						if (player.grounded)
 							player.displayWalkRight();
 						level.view.x -= player.walkSpeed;

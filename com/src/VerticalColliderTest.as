@@ -5,35 +5,35 @@ package src {
 	import lib.ReflectionTestSuiteBuilder;
 	import lib.test.SuiteProvider;
 	import lib.Util;
-	import src.Collider;
+	import src.VerticalCollider;
 	import src.level.FakeLevelView;
 	import src.level.LevelManager;
 	import src.player.PlayerColiderSpy;
 
-	public class ColliderTest extends TestCase implements SuiteProvider {
+	public class VerticalColliderTest extends TestCase implements SuiteProvider {
 		private var player:PlayerColiderSpy;
 		private var levelView:FakeLevelView;
 		private var level:LevelManager;
-		private var collider:Collider;
+		private var collider:VerticalCollider;
 		private const platformWidth:Number = 100
 
 		public function getSuite():TestSuite {
 			var testSuite:ReflectionTestSuiteBuilder = new ReflectionTestSuiteBuilder(this)
 			testSuite.addTests([
-				collideV_no_platforms,
-				collideV_platform_about_to_touch_player,
-				collideV_miss_too_far_left,
-				collideV_scrape_too_far_left,
-				collideV_miss_too_far_right,
-				collideV_scrape_too_far_right,
-				collideV_player_too_far_away_verticaly,
-				collideV_platform_just_above_player])
+				no_platforms,
+				platform_about_to_touch_player,
+				miss_too_far_left,
+				scrape_too_far_left,
+				miss_too_far_right,
+				scrape_too_far_right,
+				player_too_far_away_verticaly,
+				platform_just_above_player])
 			return testSuite.getSuite()
 		}
 
 		// scrape means they fall with the entities sides touching (eg player right side == platform left side)
 		// a happy case and sad case for each boolean condition
-		public function ColliderTest(testMethod:String = null):void {
+		public function VerticalColliderTest(testMethod:String = null):void {
 			super(testMethod);
 		}
 
@@ -41,75 +41,75 @@ package src {
 			player = new PlayerColiderSpy()
 			levelView = new FakeLevelView()
 			level = new LevelManager(levelView)
-			collider = new Collider(player, level);
+			collider = new VerticalCollider(player, level);
 		}
 
-		public function collideV_no_platforms():void {
-			collider.collideV()
+		public function no_platforms():void {
+			collider.collide()
 			assertNoCollision()
 		}
 
-		public function collideV_platform_about_to_touch_player():void {
+		public function platform_about_to_touch_player():void {
 			addPlatformAboutToTouchPlayer()
-			collider.collideV()
+			collider.collide()
 			assertEquals(-8, levelView.y)
 			assertCollision()
 		}
 
-		public function collideV_miss_too_far_left():void {
+		public function miss_too_far_left():void {
 			addPlatformAboutToPassPlayersRightSide()
-			collider.collideV()
+			collider.collide()
 			assertNoCollision()
 		}
 
-		public function collideV_scrape_too_far_left():void {
+		public function scrape_too_far_left():void {
 			addPlatformAboutToScrapePlayersRightSide()
-			collider.collideV()
+			collider.collide()
 			assertNoCollision()
 		}
 
-		public function collideV_miss_too_far_right():void {
+		public function miss_too_far_right():void {
 			addPlatformAboutToPassPlayersLeftSide()
-			collider.collideV()
+			collider.collide()
 			assertNoCollision()
 		}
 
-		public function collideV_scrape_too_far_right():void {
+		public function scrape_too_far_right():void {
 			addPlatformAboutToScrapePlayersLeftSide()
-			collider.collideV()
+			collider.collide()
 			assertNoCollision()
 		}
 
-		public function collideV_player_too_far_away_verticaly():void {
+		public function player_too_far_away_verticaly():void {
 			addPlatformFarBelowPlayer()
-			collider.collideV()
+			collider.collide()
 			assertNoCollision()
 		}
 
-		public function collideV_platform_just_above_player():void {
+		public function platform_just_above_player():void {
 			addPlatformJustAbovePlayer()
-			collider.collideV()
+			collider.collide()
 			assertNoCollision()
 		}
 
 		private function addPlatformAboutToScrapePlayersLeftSide():void {
-			createCatchingPlatformAtX(-Collider.PLAYER_RADIUS - platformWidth)
+			createCatchingPlatformAtX(-VerticalCollider.PLAYER_RADIUS - platformWidth)
 		}
 
 		private function addPlatformAboutToPassPlayersLeftSide():void {
-			createCatchingPlatformAtX(-Collider.PLAYER_RADIUS - platformWidth - 1)
+			createCatchingPlatformAtX(-VerticalCollider.PLAYER_RADIUS - platformWidth - 1)
 		}
 
 		private function addPlatformAboutToPassPlayersRightSide():void {
-			createCatchingPlatformAtX(Collider.PLAYER_RADIUS + 1)
+			createCatchingPlatformAtX(VerticalCollider.PLAYER_RADIUS + 1)
 		}
 
 		private function addPlatformAboutToScrapePlayersRightSide():void {
-			createCatchingPlatformAtX(Collider.PLAYER_RADIUS)
+			createCatchingPlatformAtX(VerticalCollider.PLAYER_RADIUS)
 		}
 
 		private function addPlatformAboutToTouchPlayer():void {
-			createCatchingPlatformAtX(-Collider.PLAYER_RADIUS - platformWidth + 5)
+			createCatchingPlatformAtX(-VerticalCollider.PLAYER_RADIUS - platformWidth + 5)
 		}
 
 		private function createCatchingPlatformAtX(x:Number):void {
@@ -117,13 +117,13 @@ package src {
 		}
 
 		private function addPlatformFarBelowPlayer():void {
-			const xThatWouldCatchPlayer:Number = -Collider.PLAYER_RADIUS - platformWidth + 5
+			const xThatWouldCatchPlayer:Number = -VerticalCollider.PLAYER_RADIUS - platformWidth + 5
 			const yThatWouldNotCatchPlayer:Number = -player.jumpSpeed * 5
 			addPlatformAt(xThatWouldCatchPlayer, yThatWouldNotCatchPlayer)
 		}
 
 		private function addPlatformJustAbovePlayer():void {
-			const xThatWouldCatchPlayer:Number = -Collider.PLAYER_RADIUS - platformWidth + 5
+			const xThatWouldCatchPlayer:Number = -VerticalCollider.PLAYER_RADIUS - platformWidth + 5
 			const yThatWouldNotCatchPlayer:Number = player.view.y - 1
 			addPlatformAt(xThatWouldCatchPlayer, yThatWouldNotCatchPlayer)
 		}

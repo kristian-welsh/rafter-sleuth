@@ -1,11 +1,10 @@
-package lib {
+﻿package lib {
 	import flash.display.Bitmap;
 	import flash.display.DisplayObject;
 	import flash.display.MovieClip;
 	import flash.utils.describeType;
 	import flash.utils.getDefinitionByName;
 	import flash.utils.getQualifiedClassName;
-	import org.flashdevelop.utils.FlashConnect;
 
 	public class Util {
 		/**
