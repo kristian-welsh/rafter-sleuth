@@ -1,11 +1,11 @@
-package src {
+package src.collision {
 	import asunit.framework.TestCase;
 	import asunit.framework.TestSuite;
 	import flash.display.MovieClip;
 	import lib.test.ReflectionTestSuiteBuilder;
 	import lib.test.SuiteProvider;
 	import lib.Util;
-	import src.VerticalCollider;
+	import src.collision.VerticalCollider;
 	import src.level.FakeLevelView;
 	import src.level.LevelManager;
 	import src.player.PlayerColiderSpy;

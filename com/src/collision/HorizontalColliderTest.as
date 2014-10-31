@@ -1,9 +1,9 @@
-package src {
+package src.collision {
 	import asunit.framework.*;
 	import flash.display.MovieClip;
 	import lib.test.*;
 	import lib.Util;
-	import src.HorizontalCollider;
+	import src.collision.HorizontalCollider;
 	import src.level.*;
 	import src.player.PlayerColiderSpy;
 
@@ -27,7 +27,10 @@ package src {
 				no_platforms,
 				left_hard_collide,
 				left_soft_collide,
-				left_no_collide])
+				left_no_collide,
+				left_nearly_buried,
+				left_slightly_buried,
+				left_very_buried])
 			return testSuite.getSuite()
 		}
 
@@ -36,6 +39,7 @@ package src {
 		 * hard collide: player will be stuck in the wall
 		 * soft collide: player will be just touching the wall
 		 * no collide: player won't be touching the wall
+		 * buried collide: player started inside wall (should never happen)
 		 *
 		 * Quick note on nested conditional testing:
 		 * When exercising one condition the rest of the conditions
@@ -103,6 +107,26 @@ package src {
 		public function left_no_collide():void {
 			player.faceLeft()
 			collideWithWallAt(-156, -50)
+			assertNoCollision()
+		}
+
+		public function left_nearly_buried():void {
+			player.faceLeft()
+			collideWithWallAt(-146, -50)
+			assertCollisionResolvedTo(0)
+		}
+
+		// TODO: This seems like a bug, intuitively if the polayer's buried, we want to dig him out.
+		public function left_slightly_buried():void {
+			player.faceLeft()
+			collideWithWallAt(-145, -50)
+			assertNoCollision()
+		}
+
+		// TODO: This seems like a bug, intuitively if the polayer's buried, we want to dig him out.
+		public function left_very_buried():void {
+			player.faceLeft()
+			collideWithWallAt(-144, -50)
 			assertNoCollision()
 		}
 

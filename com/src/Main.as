@@ -4,6 +4,7 @@ package src {
 	import flash.media.*;
 	import flash.utils.*;
 	import lib.*;
+	import src.collision.*;
 	import src.keyboard.*;
 	import src.level.*;
 	import src.missions.*;

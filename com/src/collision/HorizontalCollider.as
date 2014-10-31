@@ -1,4 +1,4 @@
-package src {
+package src.collision {
 	import src.level.LevelManager;
 	import src.player.IPlayerColider;
 
@@ -25,8 +25,8 @@ package src {
 					if (player.view.y - player.view.height < level.view.edge_plats.getChildAt(i).y + level.view.edge_plats.y + level.view.y + 100) {
 						// player is facing left
 						if (player.isFacingLeft()) {
-							// player is entirely to the right of the wall
-							// this might be implicit fron the fact that he's walking left?
+							// # player is entirely to the right of the wall (not buried)
+							// # this might be implicit fron the fact that he's walking left?
 							if (player.view.x - PLAYER_RADIUS > level.view.edge_plats.getChildAt(i).x + level.view.edge_plats.x + level.view.x + 100) {
 								// # player is about to walk into the wall
 								if (player.view.x - PLAYER_RADIUS - player.walkSpeed < level.view.edge_plats.getChildAt(i).x + level.view.edge_plats.x + level.view.x + 100) {

@@ -1,4 +1,4 @@
-package src {
+package src.collision {
 	import flash.display.MovieClip;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
