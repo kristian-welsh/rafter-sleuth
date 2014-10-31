@@ -1,7 +1,7 @@
 package src.textbox {
 	import asunit.framework.TestCase;
 	import asunit.framework.TestSuite;
-	import lib.ReflectionTestSuiteBuilder;
+	import lib.test.ReflectionTestSuiteBuilder;
 	import lib.test.SuiteProvider;
 	import src.test.MovieClipSpy;
 

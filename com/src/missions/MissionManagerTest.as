@@ -1,7 +1,7 @@
 package src.missions {
 	import asunit.framework.TestCase;
 	import asunit.framework.TestSuite;
-	import lib.ReflectionTestSuiteBuilder;
+	import lib.test.ReflectionTestSuiteBuilder;
 	import lib.test.SuiteProvider;
 	import src.level.LevelManagerSpy;
 	import src.missions.text_panes.*;

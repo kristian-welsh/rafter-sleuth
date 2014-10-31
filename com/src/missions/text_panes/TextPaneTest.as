@@ -1,7 +1,7 @@
 package src.missions.text_panes {
 	import asunit.framework.TestCase;
 	import asunit.framework.TestSuite;
-	import lib.ReflectionTestSuiteBuilder;
+	import lib.test.ReflectionTestSuiteBuilder;
 	import lib.test.SuiteProvider;
 	import src.missions.MissionManagerFake;
 	import src.textbox.FakeTextBox;

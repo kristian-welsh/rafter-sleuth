@@ -96,7 +96,7 @@ package src {
 				return;
 			if (player.canMove) {
 				if (keys.leftKeyDown && !keys.rightKeyDown) {
-					if (!horizontalCollider.collideH()) {
+					if (!horizontalCollider.collide()) {
 						if (player.grounded)
 							player.displayWalkLeft();
 						level.view.x += player.walkSpeed;
@@ -104,7 +104,7 @@ package src {
 					player.setLastDireciton("left");
 				}
 				if (!keys.leftKeyDown && keys.rightKeyDown) {
-					if (!horizontalCollider.collideH()) {
+					if (!horizontalCollider.collide()) {
 						if (player.grounded)
 							player.displayWalkRight();
 						level.view.x -= player.walkSpeed;

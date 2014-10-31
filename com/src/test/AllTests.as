@@ -1,12 +1,13 @@
 package src.test {
 	import asunit.framework.TestSuite;
 	import lib.test.SuiteProvider;
-	import src.VerticalColliderTest;
+	import src.HorizontalColliderTest;
 	import src.keyboard.KeyboardControlsTest;
 	import src.missions.MissionManagerTest;
 	import src.missions.text_panes.TextPaneTest;
 	import src.textbox.TextBoxTest;
 	import src.ui.UserInterfaceManagerTest;
+	import src.VerticalColliderTest;
 
 	public class AllTests extends TestSuite {
 		public function AllTests() {
@@ -16,6 +17,7 @@ package src.test {
 			addTestClass(new TextBoxTest())
 			addTestClass(new TextPaneTest())
 			addTestClass(new VerticalColliderTest())
+			addTestClass(new HorizontalColliderTest())
 		}
 
 		private function addTestClass(tests:SuiteProvider):void {

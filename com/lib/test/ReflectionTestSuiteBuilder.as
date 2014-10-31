@@ -1,5 +1,7 @@
-package lib {
+package lib.test {
 	import asunit.framework.TestSuite;
+	import lib.assert;
+	import lib.Util;
 
 	public class ReflectionTestSuiteBuilder {
 		private var objectInstance:Object;

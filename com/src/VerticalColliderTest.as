@@ -2,7 +2,7 @@ package src {
 	import asunit.framework.TestCase;
 	import asunit.framework.TestSuite;
 	import flash.display.MovieClip;
-	import lib.ReflectionTestSuiteBuilder;
+	import lib.test.ReflectionTestSuiteBuilder;
 	import lib.test.SuiteProvider;
 	import lib.Util;
 	import src.VerticalCollider;

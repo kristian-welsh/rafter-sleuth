@@ -3,7 +3,7 @@ package src.keyboard {
 	import asunit.framework.TestSuite;
 	import flash.events.EventDispatcher;
 	import flash.events.KeyboardEvent;
-	import lib.ReflectionTestSuiteBuilder;
+	import lib.test.ReflectionTestSuiteBuilder;
 	import lib.test.SuiteProvider;
 	import src.missions.MissionManagerSpy;
 

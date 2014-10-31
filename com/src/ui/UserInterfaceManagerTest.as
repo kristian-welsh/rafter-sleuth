@@ -1,7 +1,7 @@
 package src.ui {
 	import asunit.framework.TestCase;
 	import asunit.framework.TestSuite;
-	import lib.ReflectionTestSuiteBuilder;
+	import lib.test.ReflectionTestSuiteBuilder;
 	import lib.test.SuiteProvider;
 
 	public class UserInterfaceManagerTest extends TestCase implements SuiteProvider {

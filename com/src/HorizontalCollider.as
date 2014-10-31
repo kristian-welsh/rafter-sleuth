@@ -15,7 +15,7 @@ package src {
 		}
 
 		/// Warning: both a command and a query
-		public function collideH():Boolean {
+		public function collide():Boolean {
 			var returnValue:Boolean;
 			for (var i:uint = 0; i < level.view.edge_plats.numChildren; i++) {
 				if (player.view.y > level.view.edge_plats.getChildAt(i).y + level.view.edge_plats.y + level.view.y) {
