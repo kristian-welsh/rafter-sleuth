@@ -14,7 +14,8 @@ package src.collision {
 	 */
 	public class HorizontalColliderTest extends TestCase implements SuiteProvider {
 		static public const WALL_WIDTH:Number = 100
-		static public const PLAYER_RADIUS:Number = 45
+		static public const PLAYER_RADIUS:Number = 90 / 2
+		static public const TRIVIAL_WALL_Y:Number = -50
 
 		private var player:PlayerColiderSpy;
 		private var levelView:FakeLevelView;
@@ -31,8 +32,8 @@ package src.collision {
 				left_soft_collide,
 				left_no_collide,
 				left_nearly_buried,
-				left_slightly_buried,
-				left_very_buried,
+				left_soft_buried,
+				left_hard_buried,
 				left_hard_collide_but_facing_right])
 			return testSuite.getSuite()
 		}
@@ -60,8 +61,8 @@ package src.collision {
 			collider = new HorizontalCollider(player, level);
 		}
 
-		private function collideWithWallAt(x:Number, y:Number):void {
-			addWallAt(x, y)
+		private function collideWithWallPlacedAt(x:Number):void {
+			addWallAt(x, TRIVIAL_WALL_Y)
 			collide()
 		}
 
@@ -95,48 +96,54 @@ package src.collision {
 			assertNoCollision();
 		}
 
+		public function left_hard_collide_but_facing_right():void {
+			player.faceRight()
+			collideWithWallPlacedAt(willSoftCollideLeft() + 1)
+			assertNoCollision()
+		}
+
 		public function left_hard_collide():void {
 			player.faceLeft()
-			collideWithWallAt(-154, -50)
+			collideWithWallPlacedAt(willSoftCollideLeft() + 1)
 			assertCollisionResolvedTo(-8)
 		}
 
 		public function left_soft_collide():void {
 			player.faceLeft()
-			collideWithWallAt(-155, -50)
+			collideWithWallPlacedAt(willSoftCollideLeft() )
 			assertNoCollision()
 		}
 
 		public function left_no_collide():void {
 			player.faceLeft()
-			collideWithWallAt(-156, -50)
+			collideWithWallPlacedAt(willSoftCollideLeft() - 1)
+			assertNoCollision()
+		}
+
+		private function willSoftCollideLeft():Number {
+			return 0 - WALL_WIDTH - PLAYER_RADIUS - player.walkSpeed
+		}
+
+		public function left_hard_buried():void {
+			player.faceLeft()
+			collideWithWallPlacedAt(willSoftBuryLeft() + 1)
+			assertNoCollision()
+		}
+
+		public function left_soft_buried():void {
+			player.faceLeft()
+			collideWithWallPlacedAt(willSoftBuryLeft())
 			assertNoCollision()
 		}
 
 		public function left_nearly_buried():void {
 			player.faceLeft()
-			collideWithWallAt(-146, -50)
+			collideWithWallPlacedAt(willSoftBuryLeft() - 1)
 			assertCollisionResolvedTo(0)
 		}
 
-		// TODO: This seems like a bug, intuitively if the polayer's buried, we want to dig him out.
-		public function left_slightly_buried():void {
-			player.faceLeft()
-			collideWithWallAt(-145, -50)
-			assertNoCollision()
-		}
-
-		// TODO: This seems like a bug, intuitively if the polayer's buried, we want to dig him out.
-		public function left_very_buried():void {
-			player.faceLeft()
-			collideWithWallAt(-144, -50)
-			assertNoCollision()
-		}
-
-		public function left_hard_collide_but_facing_right():void {
-			player.faceRight()
-			collideWithWallAt(-154, -50)
-			assertNoCollision()
+		private function willSoftBuryLeft():Number {
+			return willSoftCollideLeft() + player.walkSpeed
 		}
 
 		private function assertCollisionResolvedTo(newPlayerX:Number):void {
