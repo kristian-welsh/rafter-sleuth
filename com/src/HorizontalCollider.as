@@ -14,6 +14,7 @@ package src {
 			this.player = player;
 		}
 
+		// means the line is fully covered by tests: #
 		/// Warning: both a command and a query
 		public function collide():Boolean {
 			var returnValue:Boolean;
@@ -25,13 +26,16 @@ package src {
 						// player is facing left
 						if (player.isFacingLeft()) {
 							// player is entirely to the right of the wall
+							// this might be implicit fron the fact that he's walking left?
 							if (player.view.x - PLAYER_RADIUS > level.view.edge_plats.getChildAt(i).x + level.view.edge_plats.x + level.view.x + 100) {
-								// player is about to walk into the wall
+								// # player is about to walk into the wall
 								if (player.view.x - PLAYER_RADIUS - player.walkSpeed < level.view.edge_plats.getChildAt(i).x + level.view.edge_plats.x + level.view.x + 100) {
-									// hug the player to the wall
+									// # hug the player to the wall
+									// # Adjusts player instead of level, probably a bug
 									player.view.x = level.view.edge_plats.getChildAt(i).x + level.view.edge_plats.x + level.view.x + 100 + PLAYER_RADIUS + 1;
-									// stop the player
+									// # stop the player
 									player.displayIdleLeft();
+									// #
 									returnValue = true;
 									break;
 								}
@@ -40,6 +44,7 @@ package src {
 						// player is facing right
 						if (player.isFacingRight()) {
 							// player is entirely to the left of the wall
+							// this might be implicit fron the fact that he's walking right?
 							if (player.view.x + PLAYER_RADIUS < level.view.edge_plats.getChildAt(i).x + level.view.edge_plats.x + level.view.x) {
 								// player is about to walk into the wall
 								if (player.view.x + PLAYER_RADIUS + player.walkSpeed > level.view.edge_plats.getChildAt(i).x + level.view.edge_plats.x + level.view.x) {
@@ -55,10 +60,12 @@ package src {
 					}
 				}
 			}
-			// if there were no collisions
+			// # if there were no collisions
 			if (i == level.view.edge_plats.numChildren) {
+				// #
 				returnValue = false;
 			}
+			// #
 			return returnValue
 		}
 	}

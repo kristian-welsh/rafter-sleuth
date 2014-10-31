@@ -12,18 +12,21 @@ package lib.test {
 			this.objectInstance = objectInstance
 		}
 
-		private function addTest(method:Function):void {
-			var functionName:String = Util.getFunctionName(method, objectInstance)
-			var requiredTestClass:Class = Util.getClassOf(objectInstance)
-			suite.addTest(new requiredTestClass(functionName))
-		}
-
+		/**
+		 * @param	tests An array of public test functions.
+		 */
 		public function addTests(tests:Array):void {
 			tests.map(function(element:*, ... restMapParams):void {
 				assert(element is Function)
 			})
 			for each (var test:Object in tests)
 				addTest(test as Function)
+		}
+
+		private function addTest(method:Function):void {
+			var functionName:String = Util.getFunctionName(method, objectInstance)
+			var requiredTestClass:Class = Util.getClassOf(objectInstance)
+			suite.addTest(new requiredTestClass(functionName))
 		}
 
 		public function getSuite():TestSuite {

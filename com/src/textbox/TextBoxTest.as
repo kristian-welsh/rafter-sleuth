@@ -3,7 +3,7 @@ package src.textbox {
 	import asunit.framework.TestSuite;
 	import lib.test.ReflectionTestSuiteBuilder;
 	import lib.test.SuiteProvider;
-	import src.test.MovieClipSpy;
+	import lib.test.MovieClipSpy;
 
 	public class TextBoxTest extends TestCase implements SuiteProvider {
 		private var view:MovieClipSpy;

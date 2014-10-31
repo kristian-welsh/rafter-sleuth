@@ -3,7 +3,9 @@ package src.player {
 	import lib.test.Spy;
 
 	public class PlayerColiderSpy implements IPlayerColider {
+		private var _view:MovieClip = new MovieClip()
 		private var spy:Spy
+		private var facingLeft:Boolean = false;
 
 		public function getSpy():Spy {
 			return spy
@@ -14,23 +16,31 @@ package src.player {
 		}
 
 		public function get view():MovieClip {
-			return new MovieClip()
+			return _view
 		}
 
 		public function get walkSpeed():Number {
-			return 0
+			return 10
 		}
 
 		public function get jumpSpeed():Number {
 			return -10
 		}
 
+		public function faceLeft():void {
+			facingLeft = true
+		}
+
+		public function faceRight():void {
+			facingLeft = false
+		}
+
 		public function isFacingLeft():Boolean {
-			return false
+			return facingLeft
 		}
 
 		public function isFacingRight():Boolean {
-			return false
+			return !facingLeft
 		}
 
 		public function setGrounded(value:Boolean):void {
