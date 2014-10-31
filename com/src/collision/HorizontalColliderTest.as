@@ -13,13 +13,15 @@ package src.collision {
 	 * Whichever is more understandable.
 	 */
 	public class HorizontalColliderTest extends TestCase implements SuiteProvider {
+		static public const WALL_WIDTH:Number = 100
+		static public const PLAYER_RADIUS:Number = 45
+
 		private var player:PlayerColiderSpy;
 		private var levelView:FakeLevelView;
 		private var level:LevelManager;
 		private var collider:HorizontalCollider;
 
 		private var collisionResult:Boolean;
-		private const wallWidth:Number = 100
 
 		public function getSuite():TestSuite {
 			var testSuite:ReflectionTestSuiteBuilder = new ReflectionTestSuiteBuilder(this)
@@ -30,7 +32,8 @@ package src.collision {
 				left_no_collide,
 				left_nearly_buried,
 				left_slightly_buried,
-				left_very_buried])
+				left_very_buried,
+				left_hard_collide_but_facing_right])
 			return testSuite.getSuite()
 		}
 
@@ -77,7 +80,7 @@ package src.collision {
 		// Warning: mostly dupllicated in VerticalColliderTest
 		private function createStandardSizeWall():MovieClip {
 			var wall:MovieClip = new MovieClip()
-			Util.setMovieClipWidth(wall, wallWidth)
+			Util.setMovieClipWidth(wall, WALL_WIDTH)
 			Util.setMovieClipHeight(wall, 100)
 			return wall
 		}
@@ -127,6 +130,12 @@ package src.collision {
 		public function left_very_buried():void {
 			player.faceLeft()
 			collideWithWallAt(-144, -50)
+			assertNoCollision()
+		}
+
+		public function left_hard_collide_but_facing_right():void {
+			player.faceRight()
+			collideWithWallAt(-154, -50)
 			assertNoCollision()
 		}
 
